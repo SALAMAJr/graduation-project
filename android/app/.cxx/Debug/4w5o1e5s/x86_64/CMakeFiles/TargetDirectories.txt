@@ -1,0 +1,2 @@
+E:/graduation project/FurniSwap-feature-api-integration/android/app/.cxx/Debug/4w5o1e5s/x86_64/CMakeFiles/edit_cache.dir
+E:/graduation project/FurniSwap-feature-api-integration/android/app/.cxx/Debug/4w5o1e5s/x86_64/CMakeFiles/rebuild_cache.dir
