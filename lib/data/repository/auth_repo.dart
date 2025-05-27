@@ -5,7 +5,12 @@ import 'package:furniswap/data/models/auth/signup_response/register.response.dar
 
 abstract class AuthRepo {
   Future<Either<Failure, Register>> registerUser(Map<String, dynamic> data);
-  Future<Either<Failure, String>> verifyOtp(
-      {required String email, required String otp});
+  Future<Either<Failure, String>> verifyOtp({
+    required String email,
+    required String otp,
+  });
   Future<Either<Failure, LoginResponse>> loginUser(Map<String, dynamic> data);
+
+  // ✅ جديد
+  Future<Either<Failure, String>> sendFcmToken(String token);
 }

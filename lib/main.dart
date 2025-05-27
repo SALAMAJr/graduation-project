@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 import 'package:furniswap/data/api_services/api_sevice.dart';
 import 'package:furniswap/data/repository/auth_repoImpl.dart';
@@ -23,21 +25,21 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  // ✅ تهيئة Hive
+  await Hive.initFlutter();
+  await Hive.openBox('authBox');
+
   // ✅ تهيئة Firebase
   await Firebase.initializeApp();
 
   // ✅ تسجيل الـ background handler
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
-  // ✅ طباعة الـ FCM Token
+  // ✅ طباعة FCM Token
   final fcmToken = await FirebaseMessaging.instance.getToken();
   print('✅ FCM Token: $fcmToken');
 
   // ✅ استقبال الرسائل في foreground
-  // FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-  //   print("📩 Foreground Message: ${message.notification?.title}");
-  // });
-
   FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
     print("🚀 App opened from Notification: ${message.notification?.title}");
   });

@@ -23,4 +23,17 @@ class ApiService {
     );
     return response.data;
   }
+
+  Future<Map<String, dynamic>> patch({
+    required String endPoint,
+    required Map<String, dynamic> data,
+    Map<String, String>? headers,
+  }) async {
+    var response = await _dio.patch(
+      '$_baseUrl$endPoint',
+      data: data,
+      options: Options(headers: headers),
+    );
+    return response.data;
+  }
 }
