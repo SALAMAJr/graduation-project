@@ -1,18 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:dio/dio.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:hive/hive.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:hive_flutter/hive_flutter.dart'; // ✅ استيراد Hive Flutter
 
-import 'package:furniswap/data/api_services/api_sevice.dart';
-import 'package:furniswap/data/repository/auth_repoImpl.dart';
+import 'package:furniswap/core/injection/setup_dependencies.dart';
 import 'package:furniswap/data/repository/auth_repo.dart';
-import 'package:furniswap/data/repository/review/review_repo.dart';
-import 'package:furniswap/data/repository/review/review_repo_impl.dart';
+import 'package:furniswap/data/repository/chating/chat_repo.dart';
 import 'package:furniswap/presentation/manager/cubit/login_cubit.dart';
-import 'package:furniswap/presentation/manager/review/cubit/review_cubit.dart';
 import 'package:furniswap/presentation/manager/signup/sign_up_cubit.dart';
 import 'package:furniswap/presentation/screens/splash_screen.dart';
 
@@ -28,10 +23,17 @@ Future<void> main() async {
   // ✅ تهيئة Firebase
   await Firebase.initializeApp();
 
+  // ✅ تهيئة Hive وفتح الـ Box
+  await Hive.initFlutter(); // مهم جدًا
+  await Hive.openBox('authBox'); // افتح البوكس اللي هنستخدمه
+
+  // ✅ تهيئة Dependencies
+  setupDependencies();
+
   // ✅ تسجيل الـ background handler
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
-  // ✅ طباعة FCM Token
+  // ✅ طباعة الـ FCM Token
   final fcmToken = await FirebaseMessaging.instance.getToken();
   print('✅ FCM Token: $fcmToken');
 
@@ -40,11 +42,9 @@ Future<void> main() async {
     print("🚀 App opened from Notification: ${message.notification?.title}");
   });
 
-  final dio = Dio();
-  final apiService = ApiService(dio);
-  final AuthRepo authRepo = AuthRepoImpl(apiService);
-
-  runApp(MyApp(authRepo: authRepo, reviewRepo: reviewRepo));
+  runApp(MyApp(
+    authRepo: getIt<AuthRepo>(),
+  ));
 }
 
 class MyApp extends StatelessWidget {
@@ -60,7 +60,12 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (_) => SignUpCubit(authRepo)),
-        BlocProvider(create: (_) => LoginCubit(authRepo)),
+        BlocProvider(
+          create: (context) => LoginCubit(
+            getIt<AuthRepo>(),
+            getIt<ChatRepo>(),
+          ),
+        ),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

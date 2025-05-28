@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:furniswap/data/repository/chating/chat_repo.dart';
 import 'package:hive/hive.dart';
 
 import 'package:furniswap/core/errors/failures.dart';
@@ -11,8 +12,9 @@ part 'login_state.dart';
 
 class LoginCubit extends Cubit<LoginState> {
   final AuthRepo authRepo;
+  final ChatRepo chatRepo;
 
-  LoginCubit(this.authRepo) : super(LoginInitial());
+  LoginCubit(this.authRepo, this.chatRepo) : super(LoginInitial());
 
   Future<void> login({required String email, required String password}) async {
     emit(LoginLoading());
@@ -29,20 +31,32 @@ class LoginCubit extends Cubit<LoginState> {
         emit(LoginFailure(errorMessage));
       },
       (loginResponse) async {
-        // ✅ 1. خزّن accessToken في Hive
         final token = loginResponse.accessToken;
+        final userId = loginResponse.id;
+
+        // ✅ تأكد من فتح authBox
+        final box = await Hive.openBox('authBox');
+
+        // ✅ 1. خزّن التوكن
         if (token != null && token.isNotEmpty) {
-          await Hive.box('authBox').put('auth_token', token);
+          await box.put('auth_token', token);
           print('🔐 Token saved: $token');
         } else {
           print('⚠️ No access token received!');
         }
 
-        // ✅ 2. احصل على FCM Token
+        // ✅ 2. خزّن الـ userId
+        if (userId != null && userId.isNotEmpty) {
+          await box.put('user_id', userId);
+          print('🆔 User ID saved to device: $userId');
+        } else {
+          print('⚠️ No user ID received!');
+        }
+
+        // ✅ 3. FCM Token
         final fcmToken = await FirebaseMessaging.instance.getToken();
         print('📲 FCM Token: $fcmToken');
 
-        // ✅ 3. ابعته للسيرفر (مع التوكن)
         if (fcmToken != null && fcmToken.isNotEmpty) {
           final fcmResult = await authRepo.sendFcmToken(fcmToken);
 
@@ -59,7 +73,26 @@ class LoginCubit extends Cubit<LoginState> {
           print('⚠️ No FCM token available.');
         }
 
-        // ✅ 4. كمل نجاح الـ login
+        // ✅ 4. توصيل socket
+        final socketResult = await chatRepo.connect();
+        socketResult.fold(
+          (failure) {
+            String errorMessage = 'Socket connection failed';
+
+            if (failure is ServerFailure) {
+              errorMessage = failure.message;
+            } else if (failure is NetworkFailure) {
+              errorMessage = failure.message;
+            } else if (failure is UnknownFailure) {
+              errorMessage = failure.message;
+            }
+
+            print('❌ $errorMessage');
+          },
+          (_) => print("✅ Socket connected after login"),
+        );
+
+        // ✅ 5. Success
         emit(LoginSuccess(loginResponse));
       },
     );
