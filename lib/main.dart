@@ -25,10 +25,6 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // ✅ تهيئة Hive
-  await Hive.initFlutter();
-  await Hive.openBox('authBox');
-
   // ✅ تهيئة Firebase
   await Firebase.initializeApp();
 
@@ -47,19 +43,16 @@ Future<void> main() async {
   final dio = Dio();
   final apiService = ApiService(dio);
   final AuthRepo authRepo = AuthRepoImpl(apiService);
-  final ReviewRepo reviewRepo = ReviewRepoImpl(apiService);
 
   runApp(MyApp(authRepo: authRepo, reviewRepo: reviewRepo));
 }
 
 class MyApp extends StatelessWidget {
   final AuthRepo authRepo;
-  final ReviewRepo reviewRepo;
 
   const MyApp({
     super.key,
     required this.authRepo,
-    required this.reviewRepo,
   });
 
   @override
@@ -68,7 +61,6 @@ class MyApp extends StatelessWidget {
       providers: [
         BlocProvider(create: (_) => SignUpCubit(authRepo)),
         BlocProvider(create: (_) => LoginCubit(authRepo)),
-        BlocProvider(create: (_) => ReviewCubit(reviewRepo)),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
