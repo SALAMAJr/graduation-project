@@ -6,7 +6,7 @@ abstract class SocketService {
   void getChatList(Function(List<Map<String, dynamic>>) onData);
 
   /// إرسال رسالة لغرفة معينة
-  void sendMessage(Map<String, dynamic> message);
+  void sendMessage({required String receiverId, required String content});
 
   /// الاستماع للرسائل الجديدة
   void onMessage(Function(Map<String, dynamic>) callback);

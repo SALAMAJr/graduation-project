@@ -38,12 +38,11 @@ class SocketServiceImpl implements SocketService {
   }
 
   @override
-  void joinRoom(String roomId) {
-    _socket.emit("join_room", roomId);
-  }
-
-  @override
-  void sendMessage(Map<String, dynamic> message) {
+  void sendMessage({required String receiverId, required String content}) {
+    final message = {
+      "receiverId": receiverId,
+      "content": content,
+    };
     _socket.emit("send_message", message);
   }
 

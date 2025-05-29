@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:hive_flutter/hive_flutter.dart'; // ✅ استيراد Hive Flutter
+import 'package:furniswap/data/repository/createproducts/product_repo.dart';
+import 'package:furniswap/presentation/manager/cubit/product_cubit.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 import 'package:furniswap/core/injection/setup_dependencies.dart';
 import 'package:furniswap/data/repository/auth_repo.dart';
@@ -11,7 +13,6 @@ import 'package:furniswap/presentation/manager/cubit/login_cubit.dart';
 import 'package:furniswap/presentation/manager/signup/sign_up_cubit.dart';
 import 'package:furniswap/presentation/screens/splash_screen.dart';
 
-/// ✅ handler بيشتغل لما يجيلك إشعار والتطبيق مقفول
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
   print('💤 Background Message: ${message.messageId}');
@@ -20,39 +21,35 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // ✅ تهيئة Firebase
   await Firebase.initializeApp();
+  await Hive.initFlutter();
+  await Hive.openBox('authBox');
 
-  // ✅ تهيئة Hive وفتح الـ Box
-  await Hive.initFlutter(); // مهم جدًا
-  await Hive.openBox('authBox'); // افتح البوكس اللي هنستخدمه
-
-  // ✅ تهيئة Dependencies
   setupDependencies();
 
-  // ✅ تسجيل الـ background handler
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
-  // ✅ طباعة الـ FCM Token
   final fcmToken = await FirebaseMessaging.instance.getToken();
   print('✅ FCM Token: $fcmToken');
 
-  // ✅ استقبال الرسائل في foreground
   FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
     print("🚀 App opened from Notification: ${message.notification?.title}");
   });
 
   runApp(MyApp(
     authRepo: getIt<AuthRepo>(),
+    productRepo: getIt<ProductRepo>(),
   ));
 }
 
 class MyApp extends StatelessWidget {
   final AuthRepo authRepo;
+  final ProductRepo productRepo;
 
   const MyApp({
     super.key,
     required this.authRepo,
+    required this.productRepo,
   });
 
   @override
@@ -65,6 +62,9 @@ class MyApp extends StatelessWidget {
             getIt<AuthRepo>(),
             getIt<ChatRepo>(),
           ),
+        ),
+        BlocProvider(
+          create: (_) => ProductCubit(productRepo),
         ),
       ],
       child: MaterialApp(

@@ -31,7 +31,10 @@ class ChatRepoImpl implements ChatRepo {
   @override
   Future<Either<Failure, Unit>> sendMessage(ChatMessageModel message) async {
     try {
-      socketService.sendMessage(message.toJson());
+      socketService.sendMessage(
+        receiverId: message.receiverId,
+        content: message.message,
+      );
       return right(unit);
     } catch (e) {
       return left(ServerFailure(message: "Failed to send message"));

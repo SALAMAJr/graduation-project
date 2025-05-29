@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:furniswap/icons/icons.dart';
+import 'package:furniswap/presentation/screens/CreateProductScreen.dart';
 import 'package:furniswap/presentation/screens/messages_list_screen.dart';
 import 'package:furniswap/presentation/screens/notifications_screen.dart';
 import 'package:furniswap/presentation/screens/update_product_screen.dart';
@@ -13,8 +14,10 @@ class ListingsScreen extends StatelessWidget {
       borderRadius: BorderRadius.circular(12),
       child: InkWell(
         onTap: () {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => UpdateProductScreen()));
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => UpdateProductScreen()),
+          );
         },
         borderRadius: BorderRadius.circular(12),
         splashColor: Colors.brown.withOpacity(0.1),
@@ -36,18 +39,19 @@ class ListingsScreen extends StatelessWidget {
           child: Row(
             children: [
               ClipRRect(
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(12),
-                    bottomLeft: Radius.circular(12),
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(12),
+                  bottomLeft: Radius.circular(12),
+                ),
+                child: SizedBox(
+                  height: 125,
+                  width: 125,
+                  child: Image.asset(
+                    "assets/images/Vintage_Armchair2.png",
+                    fit: BoxFit.cover,
                   ),
-                  child: SizedBox(
-                    height: 125,
-                    width: 125,
-                    child: Image(
-                      image: AssetImage("assets/images/Vintage_Armchair2.png"),
-                      fit: BoxFit.cover,
-                    ),
-                  )),
+                ),
+              ),
               SizedBox(width: 5),
               Expanded(
                 child: Padding(
@@ -158,9 +162,9 @@ class ListingsScreen extends StatelessWidget {
                 const Icon(Icons.notifications_none, color: Color(0xff694A38)),
             onPressed: () {
               Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => NotificationsScreen()));
+                context,
+                MaterialPageRoute(builder: (context) => NotificationsScreen()),
+              );
             },
             style: TextButton.styleFrom(
               padding: EdgeInsets.symmetric(horizontal: 3),
@@ -172,9 +176,9 @@ class ListingsScreen extends StatelessWidget {
             icon: const Icon(Icons.sms_outlined, color: Color(0xff694A38)),
             onPressed: () {
               Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => MessagesListScreen()));
+                context,
+                MaterialPageRoute(builder: (context) => MessagesListScreen()),
+              );
             },
             style: TextButton.styleFrom(
               padding: EdgeInsets.only(left: 3, right: 8),
@@ -191,31 +195,31 @@ class ListingsScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               ElevatedButton(
-                  onPressed: () {},
-                  style: ElevatedButton.styleFrom(
-                      padding: EdgeInsets.symmetric(horizontal: 12),
-                      elevation: 5,
-                      backgroundColor: Color(0xff694A38),
-                      shadowColor: Colors.black26,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(90))),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.add,
-                        color: Colors.black,
-                        size: 20,
-                      ),
-                      SizedBox(
-                        width: 3,
-                      ),
-                      Text(
-                        "Add New",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ],
-                  )),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => CreateProductScreen()),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  padding: EdgeInsets.symmetric(horizontal: 12),
+                  elevation: 5,
+                  backgroundColor: Color(0xff694A38),
+                  shadowColor: Colors.black26,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(90),
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.add, color: Colors.black, size: 20),
+                    SizedBox(width: 3),
+                    Text("Add New", style: TextStyle(color: Colors.white)),
+                  ],
+                ),
+              ),
               SizedBox(
                 child: ListView.builder(
                   shrinkWrap: true,
