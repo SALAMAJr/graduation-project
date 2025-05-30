@@ -140,31 +140,23 @@ class _LoginScreenState extends State<LoginScreen> {
                           hintText: "password",
                           controller: passwordController,
                         ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            TextButton(
-                              onPressed: () {},
-                              child: const Text("Remember me",
-                                  style: TextStyle(color: Colors.black)),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: TextButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => const ForgotPasswordScreen(),
+                                ),
+                              );
+                            },
+                            child: const Text(
+                              "Forgot Password?",
+                              style: TextStyle(
+                                  fontSize: 14, color: Color(0xff8B5E3C)),
                             ),
-                            TextButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) =>
-                                        const ForgotPasswordScreen(),
-                                  ),
-                                );
-                              },
-                              child: const Text(
-                                "Forgot Password?",
-                                style: TextStyle(
-                                    fontSize: 14, color: Color(0xff8B5E3C)),
-                              ),
-                            ),
-                          ],
+                          ),
                         ),
                         const SizedBox(height: 10),
                         state is LoginLoading

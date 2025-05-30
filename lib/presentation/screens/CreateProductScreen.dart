@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:furniswap/presentation/manager/cubit/product_cubit.dart';
 import 'package:furniswap/data/models/createproduct/product_entity.dart';
+import 'package:furniswap/presentation/screens/listings_screen.dart';
 
 class CreateProductScreen extends StatefulWidget {
   const CreateProductScreen({super.key});
@@ -19,8 +20,8 @@ class _CreateProductScreenState extends State<CreateProductScreen> {
   final _descriptionController = TextEditingController();
 
   final _conditionOptions = ['used', 'likeNew'];
-  final _typeOptions = ['buy', 'repair', 'swap']; // ✅ أنواع صحيحة
-  final _statusOptions = ['active', 'on_hold', 'sold'];
+  final _typeOptions = ['buy', 'repair', 'swap'];
+  final _statusOptions = ['available', 'on_hold', 'sold'];
 
   String? _selectedCondition;
   String? _selectedType;
@@ -61,11 +62,11 @@ class _CreateProductScreenState extends State<CreateProductScreen> {
       name: _nameController.text.trim(),
       price: double.parse(_priceController.text.trim()),
       description: _descriptionController.text.trim(),
-      imageFile: _selectedImage!, // ✅ مهمة
+      imageFile: _selectedImage!,
       condition: _selectedCondition!,
       type: _selectedType!,
       status: _selectedStatus!,
-      imageUrl: null, // ✅ مش مطلوب وقت الإنشاء
+      imageUrl: null,
     );
 
     context.read<ProductCubit>().createProduct(product);
@@ -79,7 +80,11 @@ class _CreateProductScreenState extends State<CreateProductScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text("✅ تم إنشاء المنتج بنجاح")),
           );
-          Navigator.pop(context);
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => ListingsScreen()),
+            (route) => false,
+          );
         } else if (state is ProductFailure) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text("❌ فشل: ${state.message}")),

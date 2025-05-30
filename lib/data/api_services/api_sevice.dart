@@ -8,9 +8,15 @@ class ApiService {
 
   ApiService(this._dio);
 
-  Future<Map<String, dynamic>> get({required String endPoint}) async {
+  Future<Map<String, dynamic>> get({
+    required String endPoint,
+    Map<String, String>? headers, // ✅ تمت الإضافة
+  }) async {
     try {
-      var response = await _dio.get('$_baseUrl$endPoint');
+      var response = await _dio.get(
+        '$_baseUrl$endPoint',
+        options: Options(headers: headers), // ✅ استخدامها
+      );
       return response.data;
     } on DioException catch (e) {
       throw e;
@@ -65,7 +71,7 @@ class ApiService {
           fileField: await MultipartFile.fromFile(
             file.path,
             filename: file.path.split('/').last,
-            contentType: MediaType('image', 'jpeg'), // ✅ مهم جداً
+            contentType: MediaType('image', 'jpeg'),
           ),
       });
 

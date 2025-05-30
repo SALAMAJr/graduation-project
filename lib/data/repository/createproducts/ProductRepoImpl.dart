@@ -21,7 +21,11 @@ class ProductRepoImpl implements ProductRepo {
       print("📦 Data to be sent:");
       data.forEach((key, value) => print("👉 $key: $value"));
 
-      print("📁 Image file path: ${product.imageFile.path}");
+      if (product.imageFile != null) {
+        print("📁 Image file path: ${product.imageFile!.path}");
+      } else {
+        print("⚠️ Warning: No image file provided.");
+      }
 
       final token = await Hive.box('authBox').get('auth_token');
       print("🪪 Token: $token");
@@ -29,7 +33,7 @@ class ProductRepoImpl implements ProductRepo {
       final response = await apiService.postMultipart(
         endPoint: '/product/create',
         data: data,
-        file: product.imageFile,
+        file: product.imageFile!,
         headers: {'Authorization': 'Bearer $token'},
       );
 
@@ -42,6 +46,43 @@ class ProductRepoImpl implements ProductRepo {
     } catch (e) {
       if (e is DioException) {
         print("❌ DioException caught:");
+        print("📡 Status Code: ${e.response?.statusCode}");
+        print("📨 Response Body: ${e.response?.data}");
+        print("📃 Error Message: ${e.message}");
+
+        return Left(ServerFailure(
+          message: e.response?.data.toString() ?? "Unknown Dio error",
+        ));
+      }
+
+      print("❌ Unknown Error: $e");
+      return Left(ServerFailure(message: e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<ProductItem>>> getMyProducts() async {
+    try {
+      final token = await Hive.box('authBox').get('auth_token');
+      print("🔐 Fetching my products with token: $token");
+
+      final response = await apiService.get(
+        endPoint: '/product/availableProducts',
+        headers: {'Authorization': 'Bearer $token'},
+      );
+
+      print("✅ Products API Response: ${response['data']}");
+
+      final List productsJson = response['data']['products'];
+
+      final products = productsJson
+          .map((json) => ProductItem.fromJson(json))
+          .toList(); // ✅ هنا
+
+      return Right(products);
+    } catch (e) {
+      if (e is DioException) {
+        print("❌ DioException caught while fetching products:");
         print("📡 Status Code: ${e.response?.statusCode}");
         print("📨 Response Body: ${e.response?.data}");
         print("📃 Error Message: ${e.message}");

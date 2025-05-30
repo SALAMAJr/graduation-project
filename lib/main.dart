@@ -15,7 +15,7 @@ import 'package:furniswap/presentation/screens/splash_screen.dart';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
-  print('💤 Background Message: ${message.messageId}');
+  // print('💤 Background Message: ${message.messageId}');
 }
 
 Future<void> main() async {
@@ -72,33 +72,30 @@ class MyApp extends StatelessWidget {
         title: 'Furni Swap',
         theme: ThemeData(
           fontFamily: "pop",
-          splashColor: Colors.brown.withOpacity(0.1),
+          splashColor: Colors.brown.withAlpha(25),
           textButtonTheme: TextButtonThemeData(
             style: ButtonStyle(
-              overlayColor:
-                  WidgetStateProperty.all(Colors.brown.withOpacity(0.1)),
+              overlayColor: WidgetStateProperty.all(Colors.brown.withAlpha(25)),
             ),
           ),
           elevatedButtonTheme: ElevatedButtonThemeData(
             style: ButtonStyle(
-              overlayColor:
-                  WidgetStateProperty.all(Colors.brown.withOpacity(0.1)),
+              overlayColor: WidgetStateProperty.all(Colors.brown.withAlpha(25)),
             ),
           ),
           iconButtonTheme: IconButtonThemeData(
             style: ButtonStyle(
-              overlayColor:
-                  WidgetStateProperty.all(Colors.brown.withOpacity(0.1)),
+              overlayColor: WidgetStateProperty.all(Colors.brown.withAlpha(25)),
             ),
           ),
           floatingActionButtonTheme: FloatingActionButtonThemeData(
-            splashColor: Colors.brown.withOpacity(0.1),
+            splashColor: Colors.brown.withAlpha(25),
           ),
-          appBarTheme: AppBarTheme(
+          appBarTheme: const AppBarTheme(
             surfaceTintColor: Colors.black12,
           ),
         ),
-        home: SplashScreen(),
+        home: const SplashScreen(),
       ),
     );
   }

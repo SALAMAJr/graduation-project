@@ -13,3 +13,9 @@ class ProductFailure extends ProductState {
 
   ProductFailure(this.message);
 }
+
+class ProductListSuccess extends ProductState {
+  final List<ProductItem> products;
+
+  ProductListSuccess(this.products);
+}

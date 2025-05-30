@@ -5,4 +5,6 @@ import 'package:furniswap/data/models/createproduct/product_item.dart';
 
 abstract class ProductRepo {
   Future<Either<Failure, ProductItem>> createProduct(ProductEntity product);
+
+  Future<Either<Failure, List<ProductItem>>> getMyProducts(); // ✅
 }

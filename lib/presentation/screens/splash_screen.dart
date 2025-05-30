@@ -16,6 +16,7 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   void initState() {
     super.initState();
+
     _controller = AnimationController(
       duration: const Duration(milliseconds: 600),
       vsync: this,
@@ -28,6 +29,9 @@ class _SplashScreenState extends State<SplashScreen>
       parent: _controller,
       curve: Curves.easeInOut,
     ));
+
+    // ❌ حذفنا التنقل التلقائي بعد 2 ثانية
+    // Future.delayed(const Duration(seconds: 2), _navigateToLogin);
   }
 
   void _navigateToLogin() {
@@ -36,8 +40,9 @@ class _SplashScreenState extends State<SplashScreen>
 
   Route _createRoute() {
     return PageRouteBuilder(
-      transitionDuration: Duration(milliseconds: 700),
-      pageBuilder: (context, animation, secondaryAnimation) => LoginScreen(),
+      transitionDuration: const Duration(milliseconds: 700),
+      pageBuilder: (context, animation, secondaryAnimation) =>
+          const LoginScreen(),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         final curved = CurvedAnimation(
           parent: animation,
@@ -48,7 +53,7 @@ class _SplashScreenState extends State<SplashScreen>
           opacity: curved,
           child: SlideTransition(
             position: Tween<Offset>(
-              begin: Offset(0.0, 0.2),
+              begin: const Offset(0.0, 0.2),
               end: Offset.zero,
             ).animate(curved),
             child: child,
@@ -77,7 +82,7 @@ class _SplashScreenState extends State<SplashScreen>
         body: Container(
           decoration: BoxDecoration(
             image: DecorationImage(
-              image: AssetImage("assets/images/splash_bg.png"),
+              image: const AssetImage("assets/images/splash_bg.png"),
               fit: BoxFit.cover,
               colorFilter: ColorFilter.mode(
                 Colors.white.withOpacity(0.9),
@@ -92,23 +97,23 @@ class _SplashScreenState extends State<SplashScreen>
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Container(
-                      padding: EdgeInsets.all(17),
+                      padding: const EdgeInsets.all(17),
                       width: 192,
                       height: 192,
-                      decoration: BoxDecoration(
+                      decoration: const BoxDecoration(
                         color: Color.fromARGB(160, 180, 165, 91),
                       ),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           ColorFiltered(
-                            colorFilter: ColorFilter.mode(
+                            colorFilter: const ColorFilter.mode(
                               Colors.white,
                               BlendMode.srcATop,
                             ),
                             child: Image.asset("assets/images/logo.png"),
                           ),
-                          Text(
+                          const Text(
                             "Furniture Swap",
                             style: TextStyle(
                               color: Colors.white,
@@ -119,8 +124,8 @@ class _SplashScreenState extends State<SplashScreen>
                         ],
                       ),
                     ),
-                    SizedBox(height: 20),
-                    Text(
+                    const SizedBox(height: 20),
+                    const Text(
                       "Furni Swap",
                       style: TextStyle(
                         color: Color(0xff8B5E3C),
@@ -128,8 +133,8 @@ class _SplashScreenState extends State<SplashScreen>
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    SizedBox(height: 10),
-                    Text(
+                    const SizedBox(height: 10),
+                    const Text(
                       "Swap, Sell & Style Your Home The Smart Way!",
                       style: TextStyle(
                         color: Color(0xff4B5563),
@@ -152,7 +157,7 @@ class _SplashScreenState extends State<SplashScreen>
                         children: [
                           Transform.translate(
                             offset: Offset(0, _bounceAnimation.value),
-                            child: Text(
+                            child: const Text(
                               'Swipe to explore',
                               style: TextStyle(
                                 fontSize: 16,
@@ -161,10 +166,10 @@ class _SplashScreenState extends State<SplashScreen>
                               ),
                             ),
                           ),
-                          SizedBox(height: 5),
+                          const SizedBox(height: 5),
                           Transform.translate(
                             offset: Offset(0, _bounceAnimation.value),
-                            child: Icon(
+                            child: const Icon(
                               Icons.keyboard_arrow_down_rounded,
                               size: 28,
                               color: Color(0xff8B5E3C),
