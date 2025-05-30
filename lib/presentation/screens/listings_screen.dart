@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:furniswap/core/errors/failures.dart';
 import 'package:furniswap/data/models/createproduct/product_item.dart';
 import 'package:furniswap/icons/icons.dart';
 import 'package:furniswap/presentation/manager/cubit/product_cubit.dart';
@@ -59,7 +58,7 @@ class _ListingsScreenState extends State<ListingsScreen> {
                   height: 125,
                   width: 125,
                   child: Image.network(
-                    product.imageUrl ?? '',
+                    product.imageUrl ?? " ",
                     fit: BoxFit.cover,
                     errorBuilder: (_, __, ___) =>
                         const Icon(Icons.image_not_supported),

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:furniswap/auth_screens/forgot_password_screen.dart';
+import 'package:furniswap/presentation/screens/auth_screens/forgot_password_screen.dart';
 import 'package:furniswap/presentation/screens/messages_list_screen.dart';
 import 'package:furniswap/presentation/screens/notifications_screen.dart';
 

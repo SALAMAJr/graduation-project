@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:furniswap/presentation/screens/account_settings_screen.dart';
-import 'package:furniswap/auth_screens/login_screen.dart';
+import 'package:furniswap/presentation/screens/auth_screens/login_screen.dart';
 import 'package:furniswap/icons/icons.dart';
 import 'package:furniswap/presentation/screens/language_region_screen.dart';
 import 'package:furniswap/presentation/screens/messages_list_screen.dart';
