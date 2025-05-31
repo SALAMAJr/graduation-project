@@ -1,3 +1,4 @@
+// ListingsScreen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:furniswap/data/models/createproduct/product_item.dart';
@@ -30,7 +31,9 @@ class _ListingsScreenState extends State<ListingsScreen> {
         onTap: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => UpdateProductScreen()),
+            MaterialPageRoute(
+              builder: (context) => UpdateProductScreen(product: product),
+            ),
           );
         },
         borderRadius: BorderRadius.circular(12),
@@ -95,7 +98,15 @@ class _ListingsScreenState extends State<ListingsScreen> {
                             ),
                             icon: const Icon(MyFlutterApp.edit,
                                 size: 18, color: Colors.black),
-                            onPressed: () {},
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      UpdateProductScreen(product: product),
+                                ),
+                              );
+                            },
                           ),
                           IconButton(
                             style: TextButton.styleFrom(
@@ -207,7 +218,8 @@ class _ListingsScreenState extends State<ListingsScreen> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => const CreateProductScreen()),
+                    builder: (context) => const CreateProductScreen(),
+                  ),
                 );
               },
               style: ElevatedButton.styleFrom(
@@ -239,7 +251,7 @@ class _ListingsScreenState extends State<ListingsScreen> {
                     if (state is ProductLoading) {
                       return const Center(child: CircularProgressIndicator());
                     } else if (state is ProductFailure) {
-                      return Center(child: Text("❌ ${state.message}"));
+                      return Center(child: Text("\u274c ${state.message}"));
                     } else if (state is ProductListSuccess) {
                       final products = state.products;
                       if (products.isEmpty) {

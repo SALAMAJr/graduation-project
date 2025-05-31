@@ -96,4 +96,46 @@ class ProductRepoImpl implements ProductRepo {
       return Left(ServerFailure(message: e.toString()));
     }
   }
+
+  @override
+  Future<Either<Failure, ProductItem>> updateProduct(
+      ProductEntity product) async {
+    try {
+      final data = ProductModel.fromEntity(product);
+      final token = await Hive.box('authBox').get('auth_token');
+
+      print("🛠 Updating product ID: ${product.id}");
+      print("🔐 Token: $token");
+      print("📦 Data: $data");
+
+      final response = await apiService.patchMultipart(
+        endPoint: '/product/update/${product.id}',
+        data: data,
+        file: product.imageFile,
+        headers: {'Authorization': 'Bearer $token'},
+      );
+
+      print("✅ Product updated successfully");
+      print("📨 Updated Product: ${response['data']['updatedProduct']}");
+
+      final updatedProduct =
+          ProductItem.fromJson(response['data']['updatedProduct']);
+
+      return Right(updatedProduct);
+    } catch (e) {
+      if (e is DioException) {
+        print("❌ DioException caught while updating product:");
+        print("📡 Status Code: ${e.response?.statusCode}");
+        print("📨 Response Body: ${e.response?.data}");
+        print("📃 Error Message: ${e.message}");
+
+        return Left(ServerFailure(
+          message: e.response?.data.toString() ?? "Unknown Dio error",
+        ));
+      }
+
+      print("❌ Unknown Error: $e");
+      return Left(ServerFailure(message: e.toString()));
+    }
+  }
 }

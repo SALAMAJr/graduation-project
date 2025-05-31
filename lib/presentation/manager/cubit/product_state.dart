@@ -19,3 +19,9 @@ class ProductListSuccess extends ProductState {
 
   ProductListSuccess(this.products);
 }
+
+class ProductUpdatedSuccess extends ProductState {
+  final ProductItem updatedProduct;
+
+  ProductUpdatedSuccess(this.updatedProduct);
+}

@@ -89,4 +89,37 @@ class ApiService {
       throw e;
     }
   }
+
+  Future<Map<String, dynamic>> patchMultipart({
+    required String endPoint,
+    required Map<String, dynamic> data,
+    File? file,
+    String fileField = 'image',
+    Map<String, String>? headers,
+  }) async {
+    try {
+      final formData = FormData.fromMap({
+        ...data,
+        if (file != null)
+          fileField: await MultipartFile.fromFile(
+            file.path,
+            filename: file.path.split('/').last,
+            contentType: MediaType('image', 'jpeg'),
+          ),
+      });
+
+      final response = await _dio.patch(
+        '$_baseUrl$endPoint',
+        data: formData,
+        options: Options(
+          headers: headers,
+          contentType: 'multipart/form-data',
+        ),
+      );
+
+      return response.data;
+    } on DioException catch (e) {
+      throw e;
+    }
+  }
 }

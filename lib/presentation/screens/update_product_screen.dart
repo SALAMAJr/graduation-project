@@ -1,12 +1,20 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:furniswap/presentation/screens/messages_list_screen.dart';
-import 'package:furniswap/presentation/screens/notifications_screen.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:dotted_border/dotted_border.dart';
+import 'package:furniswap/data/models/createproduct/product_item.dart';
+import 'package:furniswap/data/models/createproduct/product_entity.dart';
+import 'package:furniswap/presentation/manager/cubit/product_cubit.dart';
+import 'package:furniswap/presentation/screens/messages_list_screen.dart';
+import 'package:furniswap/presentation/screens/notifications_screen.dart';
 
 class UpdateProductScreen extends StatefulWidget {
+  final ProductItem product;
+
+  const UpdateProductScreen({super.key, required this.product});
+
   @override
   State<UpdateProductScreen> createState() => _UpdateProductScreenState();
 }
@@ -16,17 +24,18 @@ class _UpdateProductScreenState extends State<UpdateProductScreen> {
   final ImagePicker _picker = ImagePicker();
   List<XFile> _images = [];
   Map<String, String> _saveProduct = {};
-  List<Map<String, dynamic>> products = [];
   String? selectedCategory;
   String selectedCondition = 'New';
+
   final List<String> _categories = [
-    "Chairs",
-    "Tables",
-    "Sofas",
-    "Desks",
-    "Cabinets",
-    "Lighting"
+    "chair",
+    "table",
+    "sofa",
+    "desk",
+    "cabinet",
+    "lighting"
   ];
+
   final List<String> _conditions = ['New', 'Like New', 'Used'];
 
   Future<void> _pickImages() async {
@@ -42,23 +51,20 @@ class _UpdateProductScreenState extends State<UpdateProductScreen> {
               Text('Please enable permission from settings to access images.'),
           actions: [
             TextButton(
-              onPressed: () => Navigator.of(ctx).pop(),
-              child: Text('Cancel'),
-            ),
+                onPressed: () => Navigator.of(ctx).pop(),
+                child: Text('Cancel')),
             TextButton(
-              onPressed: () async {
-                Navigator.of(ctx).pop();
-                await openAppSettings();
-              },
-              child: Text('Open Settings'),
-            ),
+                onPressed: () async {
+                  Navigator.of(ctx).pop();
+                  await openAppSettings();
+                },
+                child: Text('Open Settings')),
           ],
         ),
       );
       return;
     }
     final source = await showModalBottomSheet<ImageSource>(
-      backgroundColor: Colors.white,
       context: context,
       builder: (context) => SafeArea(
         child: Wrap(
@@ -97,39 +103,139 @@ class _UpdateProductScreenState extends State<UpdateProductScreen> {
     }
   }
 
-  void _saveProductData() {
+  void _submit() {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
-      final product = {
-        'title': _saveProduct['title'],
-        'description': _saveProduct['description'],
-        'location': _saveProduct['location'],
-        'category': selectedCategory,
-        'condition': selectedCondition,
-        'images': _images.map((xfile) => xfile.path).toList(),
-      };
-      setState(() {
-        products.insert(0, product);
-      });
-      _formKey.currentState!.reset();
-      _saveProduct.clear();
-      _images.clear();
-      selectedCategory = null;
-      selectedCondition = 'New';
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Product saved successfully!')),
+
+      final product = ProductEntity(
+        id: widget.product.id,
+        name: _saveProduct['title'] ?? '',
+        description: _saveProduct['description'] ?? '',
+        location: _saveProduct['location'] ?? '',
+        category: selectedCategory ?? '',
+        condition: selectedCondition.toLowerCase(),
+        type: widget.product.type ?? 'sale',
+        status: widget.product.status ?? 'active',
+        price: double.tryParse(widget.product.price.toString()) ?? 0.0,
+        imageFile: _images.isNotEmpty ? File(_images.first.path) : null,
       );
+
+      context.read<ProductCubit>().updateProduct(product);
     }
   }
 
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Color(0xFFF5F1ED),
+      appBar: AppBar(
+        centerTitle: true,
+        title: Text("Update Product",
+            style: TextStyle(
+                color: Color(0xff694A38),
+                fontSize: 20,
+                fontWeight: FontWeight.bold)),
+        backgroundColor: Colors.white,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.notifications_none, color: Color(0xff694A38)),
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => NotificationsScreen()));
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.sms_outlined, color: Color(0xff694A38)),
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => MessagesListScreen()));
+            },
+          ),
+        ],
+      ),
+      body: BlocConsumer<ProductCubit, ProductState>(
+        listener: (context, state) {
+          if (state is ProductFailure) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                  content:
+                      Text(state.message, style: TextStyle(color: Colors.red))),
+            );
+          } else if (state is ProductUpdatedSuccess) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text("✅ Product updated successfully!")),
+            );
+            Navigator.pop(context);
+          }
+        },
+        builder: (context, state) {
+          return Padding(
+            padding: const EdgeInsets.all(16),
+            child: Form(
+              key: _formKey,
+              child: ListView(
+                children: [
+                  _buildPhotoUploader(),
+                  SizedBox(height: 24),
+                  _buildTextField(
+                    'Title',
+                    'title',
+                    TextInputType.text,
+                    "Vintage Wooden Chair",
+                    initialValue: widget.product.name,
+                  ),
+                  _buildTextField('Description', 'description',
+                      TextInputType.multiline, "Describe your item...",
+                      minLines: 5, maxLines: 10),
+                  _buildDropdownField("Category", _categories, selectedCategory,
+                      (val) {
+                    setState(() => selectedCategory = val);
+                  }),
+                  _buildConditionSelector(),
+                  _buildTextField('Location', 'location', TextInputType.text,
+                      "Enter location",
+                      prefixIcon: Icons.location_on),
+                  SizedBox(height: 24),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 48,
+                    child: ElevatedButton(
+                      onPressed: state is ProductLoading ? null : _submit,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color(0xff694A38),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10)),
+                      ),
+                      child: state is ProductLoading
+                          ? CircularProgressIndicator(color: Colors.white)
+                          : Text("Save Changes",
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 16)),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
   Widget _buildTextField(
-      {required String label,
-      required String keyName,
-      required TextInputType type,
-      required String hintText,
-      IconData? prefixIcon,
-      int? minLines,
-      int? maxLines}) {
+    String label,
+    String keyName,
+    TextInputType type,
+    String hintText, {
+    IconData? prefixIcon,
+    int? minLines,
+    int? maxLines,
+    String? initialValue,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -140,24 +246,20 @@ class _UpdateProductScreenState extends State<UpdateProductScreen> {
                 color: Color(0xff6B4423))),
         SizedBox(height: 5),
         TextFormField(
+          key: ValueKey(initialValue), // عشان يتجدد لما القيمة تتغير
+          initialValue: initialValue,
           keyboardType: type,
           minLines: minLines,
           maxLines: maxLines,
           decoration: InputDecoration(
             prefixIcon: prefixIcon != null
-                ? Icon(
-                    prefixIcon,
-                    color: Color(0xff8B5E34),
-                    size: 20,
-                  )
+                ? Icon(prefixIcon, color: Color(0xff8B5E34))
                 : null,
             hintText: hintText,
             filled: true,
             fillColor: Colors.white,
             isDense: true,
-            contentPadding: prefixIcon != null
-                ? EdgeInsets.symmetric(horizontal: 12, vertical: 12)
-                : EdgeInsets.fromLTRB(12, 12, 12, 12),
+            contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
               borderSide: BorderSide(color: Color(0xffE8E2D9), width: 1),
@@ -180,12 +282,8 @@ class _UpdateProductScreenState extends State<UpdateProductScreen> {
     );
   }
 
-  Widget _buildDropdownField(
-      {required String label,
-      required List<String> items,
-      required String? value,
-      required String hintText,
-      required Function(String?) onChanged}) {
+  Widget _buildDropdownField(String label, List<String> items, String? value,
+      Function(String?) onChanged) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -203,7 +301,7 @@ class _UpdateProductScreenState extends State<UpdateProductScreen> {
             filled: true,
             fillColor: Colors.white,
             isDense: true,
-            hintText: hintText,
+            hintText: "Select $label",
             contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 12),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
@@ -255,13 +353,11 @@ class _UpdateProductScreenState extends State<UpdateProductScreen> {
                     border: Border.all(color: Color(0xffE8E2D9), width: 1),
                   ),
                   child: Center(
-                    child: Text(
-                      condition,
-                      style: TextStyle(
-                        color: isSelected ? Colors.white : Color(0xff4A3419),
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
+                    child: Text(condition,
+                        style: TextStyle(
+                          color: isSelected ? Colors.white : Color(0xff4A3419),
+                          fontWeight: FontWeight.w500,
+                        )),
                   ),
                 ),
               ),
@@ -277,9 +373,10 @@ class _UpdateProductScreenState extends State<UpdateProductScreen> {
     return Container(
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Color(0xffE8E2D9))),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Color(0xffE8E2D9)),
+      ),
       child: GestureDetector(
         onTap: _pickImages,
         child: DottedBorder(
@@ -308,146 +405,37 @@ class _UpdateProductScreenState extends State<UpdateProductScreen> {
                                 color: Color(0xffA89B8C), fontSize: 12)),
                       ],
                     )
-                  : Stack(
-                      children: [
-                        ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: _images.length,
-                          itemBuilder: (context, index) => Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Stack(
-                              children: [
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(8),
-                                  child: Image.file(
-                                    File(_images[index].path),
-                                    width: 100,
-                                    height: 150,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                                Positioned(
-                                  top: 0,
-                                  right: 0,
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      setState(() {
-                                        _images.removeAt(index);
-                                      });
-                                    },
-                                    child: Icon(Icons.cancel,
-                                        color: Colors.red, size: 20),
-                                  ),
-                                ),
-                              ],
+                  : ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: _images.length,
+                      itemBuilder: (context, index) => Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Stack(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: Image.file(
+                                File(_images[index].path),
+                                width: 100,
+                                height: 150,
+                                fit: BoxFit.cover,
+                              ),
                             ),
-                          ),
+                            Positioned(
+                              top: 0,
+                              right: 0,
+                              child: GestureDetector(
+                                onTap: () =>
+                                    setState(() => _images.removeAt(index)),
+                                child: Icon(Icons.cancel,
+                                    color: Colors.red, size: 20),
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
             ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Color(0xFFF5F1ED),
-      appBar: AppBar(
-        centerTitle: true,
-        title: Text(
-          "Update Product",
-          style: TextStyle(
-            color: Color(0xff694A38),
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        backgroundColor: Colors.white,
-        actions: [
-          IconButton(
-            icon:
-                const Icon(Icons.notifications_none, color: Color(0xff694A38)),
-            onPressed: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => NotificationsScreen()));
-            },
-            style: TextButton.styleFrom(
-              padding: EdgeInsets.symmetric(horizontal: 3),
-              minimumSize: Size.zero,
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            ),
-          ),
-          IconButton(
-            icon: const Icon(Icons.sms_outlined, color: Color(0xff694A38)),
-            onPressed: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => MessagesListScreen()));
-            },
-            style: TextButton.styleFrom(
-              padding: EdgeInsets.only(left: 3, right: 8),
-              minimumSize: Size.zero,
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            ),
-          ),
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            children: [
-              _buildPhotoUploader(),
-              SizedBox(height: 24),
-              _buildTextField(
-                  label: 'Title',
-                  keyName: 'title',
-                  type: TextInputType.text,
-                  hintText: "Vintage Wooden Chair"),
-              _buildTextField(
-                  label: 'Description',
-                  keyName: 'description',
-                  type: TextInputType.multiline,
-                  hintText: "Describe your item...",
-                  minLines: 5,
-                  maxLines: 10),
-              _buildDropdownField(
-                  label: 'Category',
-                  items: _categories,
-                  value: selectedCategory,
-                  hintText: "Select category",
-                  onChanged: (val) => setState(() => selectedCategory = val)),
-              _buildConditionSelector(),
-              _buildTextField(
-                  label: 'Location',
-                  keyName: 'location',
-                  type: TextInputType.text,
-                  hintText: "Enter location",
-                  prefixIcon: Icons.location_on),
-              SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity,
-                height: 48,
-                child: ElevatedButton(
-                  onPressed: _saveProductData,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xff694A38),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10)),
-                  ),
-                  child: Text("Save Changes",
-                      style: TextStyle(color: Colors.white, fontSize: 16)),
-                ),
-              ),
-            ],
           ),
         ),
       ),

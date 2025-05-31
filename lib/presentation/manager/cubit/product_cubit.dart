@@ -37,4 +37,17 @@ class ProductCubit extends Cubit<ProductState> {
           emit(ProductListSuccess(products)), // ✅ دلوقتي بتتعامل مع ProductItem
     );
   }
+
+  Future<void> updateProduct(ProductEntity entity) async {
+    emit(ProductLoading());
+
+    final result = await repo.updateProduct(entity);
+
+    result.fold(
+      (failure) => emit(ProductFailure(
+        failure is ServerFailure ? failure.message : 'Unknown error',
+      )),
+      (updatedProduct) => emit(ProductUpdatedSuccess(updatedProduct)),
+    );
+  }
 }

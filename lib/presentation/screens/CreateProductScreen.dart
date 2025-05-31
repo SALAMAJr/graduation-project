@@ -160,7 +160,10 @@ class _CreateProductScreenState extends State<CreateProductScreen> {
                     child: state is ProductLoading
                         ? const CircularProgressIndicator(color: Colors.white)
                         : const Text("Save Product",
-                            style: TextStyle(fontSize: 16)),
+                            style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold)),
                   )
                 ],
               ),
