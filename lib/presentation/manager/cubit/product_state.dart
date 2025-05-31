@@ -25,3 +25,5 @@ class ProductUpdatedSuccess extends ProductState {
 
   ProductUpdatedSuccess(this.updatedProduct);
 }
+
+class ProductDeletedSuccess extends ProductState {} // ✅ دي الجديدة

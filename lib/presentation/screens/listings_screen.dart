@@ -1,4 +1,3 @@
-// ListingsScreen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:furniswap/data/models/createproduct/product_item.dart';
@@ -117,7 +116,36 @@ class _ListingsScreenState extends State<ListingsScreen> {
                             ),
                             icon: const Icon(MyFlutterApp.trash_empty,
                                 size: 20, color: Colors.black),
-                            onPressed: () {},
+                            onPressed: () {
+                              showDialog(
+                                context: context,
+                                builder: (context) => AlertDialog(
+                                  title: const Text("تأكيد الحذف"),
+                                  content: const Text(
+                                      "هل أنت متأكد أنك تريد حذف هذا المنتج؟"),
+                                  actions: [
+                                    TextButton(
+                                      child: const Text("إلغاء"),
+                                      onPressed: () => Navigator.pop(context),
+                                    ),
+                                    TextButton(
+                                      child: const Text(
+                                        "نعم، حذف",
+                                        style: TextStyle(color: Colors.red),
+                                      ),
+                                      onPressed: () async {
+                                        final productCubit =
+                                            context.read<ProductCubit>();
+                                        Navigator.pop(context);
+                                        await productCubit
+                                            .deleteProduct(product.id);
+                                        await productCubit.getMyProducts();
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
                           ),
                         ],
                       ),
@@ -246,28 +274,41 @@ class _ListingsScreenState extends State<ListingsScreen> {
                 onRefresh: () async {
                   await context.read<ProductCubit>().getMyProducts();
                 },
-                child: BlocBuilder<ProductCubit, ProductState>(
-                  builder: (context, state) {
-                    if (state is ProductLoading) {
-                      return const Center(child: CircularProgressIndicator());
-                    } else if (state is ProductFailure) {
-                      return Center(child: Text("\u274c ${state.message}"));
-                    } else if (state is ProductListSuccess) {
-                      final products = state.products;
-                      if (products.isEmpty) {
-                        return const Center(
-                            child: Text("لا يوجد منتجات حالياً."));
-                      }
-                      return ListView.builder(
-                        itemCount: products.length,
-                        itemBuilder: (context, index) =>
-                            buildListingItem(context, products[index]),
+                child: BlocListener<ProductCubit, ProductState>(
+                  listener: (context, state) {
+                    if (state is ProductDeletedSuccess) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text("✅ تم حذف المنتج بنجاح")),
                       );
-                    } else {
-                      return const Center(
-                          child: Text("جارٍ تحميل المنتجات..."));
+                    } else if (state is ProductFailure) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text("❌ ${state.message}")),
+                      );
                     }
                   },
+                  child: BlocBuilder<ProductCubit, ProductState>(
+                    builder: (context, state) {
+                      if (state is ProductLoading) {
+                        return const Center(child: CircularProgressIndicator());
+                      } else if (state is ProductFailure) {
+                        return Center(child: Text("\u274c ${state.message}"));
+                      } else if (state is ProductListSuccess) {
+                        final products = state.products;
+                        if (products.isEmpty) {
+                          return const Center(
+                              child: Text("لا يوجد منتجات حالياً."));
+                        }
+                        return ListView.builder(
+                          itemCount: products.length,
+                          itemBuilder: (context, index) =>
+                              buildListingItem(context, products[index]),
+                        );
+                      } else {
+                        return const Center(
+                            child: Text("جارٍ تحميل المنتجات..."));
+                      }
+                    },
+                  ),
                 ),
               ),
             ),

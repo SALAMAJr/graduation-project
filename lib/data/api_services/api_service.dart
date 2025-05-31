@@ -122,4 +122,20 @@ class ApiService {
       throw e;
     }
   }
+
+  Future<Map<String, dynamic>> delete({
+    required String endPoint,
+    Map<String, String>? headers,
+  }) async {
+    try {
+      final response = await _dio.delete(
+        '$_baseUrl$endPoint',
+        options: Options(headers: headers),
+      );
+
+      return response.data;
+    } on DioException catch (e) {
+      throw e;
+    }
+  }
 }

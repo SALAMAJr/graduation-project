@@ -50,4 +50,17 @@ class ProductCubit extends Cubit<ProductState> {
       (updatedProduct) => emit(ProductUpdatedSuccess(updatedProduct)),
     );
   }
+
+  Future<void> deleteProduct(String productId) async {
+    emit(ProductLoading());
+
+    final result = await repo.deleteProduct(productId);
+
+    result.fold(
+      (failure) => emit(ProductFailure(
+        failure is ServerFailure ? failure.message : 'Unknown error',
+      )),
+      (_) => emit(ProductDeletedSuccess()),
+    );
+  }
 }

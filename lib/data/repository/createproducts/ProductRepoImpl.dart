@@ -1,6 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:furniswap/core/errors/failures.dart';
-import 'package:furniswap/data/api_services/api_sevice.dart';
+import 'package:furniswap/data/api_services/api_service.dart';
 import 'package:furniswap/data/models/createproduct/product_entity.dart';
 import 'package:furniswap/data/models/createproduct/product_item.dart';
 import 'package:furniswap/data/models/createproduct/product_model.dart';
@@ -73,11 +73,11 @@ class ProductRepoImpl implements ProductRepo {
 
       print("✅ Products API Response: ${response['data']}");
 
-      final List productsJson = response['data']['products'];
+      // ✅ تأمين ضد null
+      final List productsJson = response['data']?['products'] ?? [];
 
-      final products = productsJson
-          .map((json) => ProductItem.fromJson(json))
-          .toList(); // ✅ هنا
+      final products =
+          productsJson.map((json) => ProductItem.fromJson(json)).toList();
 
       return Right(products);
     } catch (e) {
@@ -125,6 +125,38 @@ class ProductRepoImpl implements ProductRepo {
     } catch (e) {
       if (e is DioException) {
         print("❌ DioException caught while updating product:");
+        print("📡 Status Code: ${e.response?.statusCode}");
+        print("📨 Response Body: ${e.response?.data}");
+        print("📃 Error Message: ${e.message}");
+
+        return Left(ServerFailure(
+          message: e.response?.data.toString() ?? "Unknown Dio error",
+        ));
+      }
+
+      print("❌ Unknown Error: $e");
+      return Left(ServerFailure(message: e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, Unit>> deleteProduct(String productId) async {
+    try {
+      final token = await Hive.box('authBox').get('auth_token');
+      print("🗑️ Deleting product ID: $productId");
+      print("🔐 Token: $token");
+
+      final response = await apiService.delete(
+        endPoint: '/product/delete/$productId',
+        headers: {'Authorization': 'Bearer $token'},
+      );
+
+      print("✅ Product deleted successfully");
+
+      return Right(unit);
+    } catch (e) {
+      if (e is DioException) {
+        print("❌ DioException caught while deleting product:");
         print("📡 Status Code: ${e.response?.statusCode}");
         print("📨 Response Body: ${e.response?.data}");
         print("📃 Error Message: ${e.message}");
