@@ -10,7 +10,7 @@ import 'package:furniswap/core/injection/setup_dependencies.dart';
 import 'package:furniswap/data/repository/auth_repo.dart';
 import 'package:furniswap/data/repository/chating/chat_repo.dart';
 import 'package:furniswap/presentation/manager/cubit/login_cubit.dart';
-import 'package:furniswap/presentation/manager/signup/sign_up_cubit.dart';
+import 'package:furniswap/presentation/manager/cubit/sign_up_cubit.dart';
 import 'package:furniswap/presentation/screens/splash_screen.dart';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {

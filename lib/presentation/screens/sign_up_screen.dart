@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:furniswap/icons/icons.dart';
-import 'package:furniswap/presentation/screens/auth_screens/login_screen.dart';
-import 'package:furniswap/presentation/manager/signup/sign_up_cubit.dart';
-import 'package:furniswap/presentation/screens/auth_screens/otp_verification_screen.dart';
+import 'package:furniswap/presentation/screens/login_screen.dart';
+import 'package:furniswap/presentation/manager/cubit/sign_up_cubit.dart';
+import 'package:furniswap/presentation/screens/otp_verification_screen.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});

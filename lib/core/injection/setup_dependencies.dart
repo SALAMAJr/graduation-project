@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:furniswap/data/repository/auth_repo.dart';
 import 'package:furniswap/data/repository/createproducts/ProductRepoImpl.dart';
 import 'package:get_it/get_it.dart';
 

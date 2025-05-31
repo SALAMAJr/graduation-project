@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:furniswap/presentation/screens/auth_screens/login_screen.dart';
+import 'package:furniswap/presentation/screens/login_screen.dart';
 import 'package:furniswap/icons/icons.dart';
 
 class ForgotPasswordScreen extends StatelessWidget {
