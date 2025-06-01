@@ -1,334 +1,152 @@
-import 'dart:io';
-import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:furniswap/presentation/screens/messages_list_screen.dart';
-import 'package:furniswap/presentation/screens/notifications_screen.dart';
-import 'package:furniswap/presentation/screens/reviews_screen.dart';
-import 'package:image_picker/image_picker.dart';
 
 class CreateReviewScreen extends StatefulWidget {
-  final String imagePath;
-  final String title;
-  const CreateReviewScreen(
-      {super.key, required this.imagePath, required this.title});
+  const CreateReviewScreen({super.key});
+
   @override
   State<CreateReviewScreen> createState() => _CreateReviewScreenState();
 }
 
 class _CreateReviewScreenState extends State<CreateReviewScreen> {
-  double rating = 4.0;
-  final TextEditingController _reviewController = TextEditingController();
-  final List<File> _selectedImages = [];
+  final TextEditingController _commentController = TextEditingController();
+  double _rating = 3.0;
 
-  Future<void> _pickImage() async {
-    showModalBottomSheet(
-      backgroundColor: Colors.white,
-      context: context,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+  void _submitReview() {
+    // لسه مفيش API - بس هنعرض SnackBar
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text("Review saved locally (UI only)"),
+        backgroundColor: Colors.green,
       ),
-      builder: (context) {
-        return SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                leading: Icon(Icons.camera_alt, color: Color(0xff694A38)),
-                title: Text("Take a photo"),
-                onTap: () async {
-                  Navigator.pop(context);
-                  final pickedFile =
-                      await ImagePicker().pickImage(source: ImageSource.camera);
-                  if (pickedFile != null) {
-                    setState(() {
-                      _selectedImages.add(File(pickedFile.path));
-                    });
-                  }
-                },
-              ),
-              ListTile(
-                leading: Icon(Icons.photo_library, color: Color(0xff694A38)),
-                title: Text("Choose from gallery"),
-                onTap: () async {
-                  Navigator.pop(context);
-                  final pickedFile = await ImagePicker()
-                      .pickImage(source: ImageSource.gallery);
-                  if (pickedFile != null) {
-                    setState(() {
-                      _selectedImages.add(File(pickedFile.path));
-                    });
-                  }
-                },
-              ),
-            ],
+    );
+  }
+
+  Widget buildProductCard() {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 20),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            blurRadius: 8,
+            spreadRadius: 2,
+            offset: const Offset(0, 2),
+          )
+        ],
+      ),
+      child: Row(
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: Image.network(
+              'https://s.france24.com/media/display/451ed2b8-eed6-11ea-afdd-005056bf87d6/w:1280/p:16x9/messi-1805.jpg',
+              width: 60,
+              height: 60,
+              fit: BoxFit.cover,
+            ),
           ),
-        );
-      },
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: const [
+                Text(
+                  "Vintage Wooden Armchair",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
+                SizedBox(height: 4),
+                Text(
+                  "From: Michael Smith",
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
-  }
-
-  void _removeImage(int index) {
-    setState(() {
-      _selectedImages.removeAt(index);
-    });
-  }
-
-  void _submitReview(BuildContext context) {
-    if (_reviewController.text.trim().isEmpty) return;
-
-    final newReview = Review(
-      title: widget.title,
-      imagePath: widget.imagePath,
-      comment: _reviewController.text,
-      rating: rating,
-    );
-
-    Navigator.pop(context, newReview);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xffF5EFE6),
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        title: const Text(
-          "Create Review",
-          style: TextStyle(
-            color: Color(0xff694A38),
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+        title: const Text("Create Review"),
+        backgroundColor: const Color(0xff694A38),
         centerTitle: true,
-        actions: [
-          IconButton(
-            icon:
-                const Icon(Icons.notifications_none, color: Color(0xff694A38)),
-            onPressed: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => NotificationsScreen()));
-            },
-            style: TextButton.styleFrom(
-              padding: EdgeInsets.symmetric(horizontal: 3),
-              minimumSize: Size.zero,
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            ),
-          ),
-          IconButton(
-            icon: const Icon(Icons.sms_outlined, color: Color(0xff694A38)),
-            onPressed: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => MessagesListScreen()));
-            },
-            style: TextButton.styleFrom(
-              padding: EdgeInsets.only(left: 3, right: 8),
-              minimumSize: Size.zero,
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            ),
-          ),
-        ],
       ),
-      body: SingleChildScrollView(
+      backgroundColor: const Color(0xffF5EFE6),
+      body: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                CircleAvatar(
-                  backgroundImage: AssetImage("assets/images/Avatar.png"),
-                  radius: 24,
-                ),
-                SizedBox(width: 10),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Sarah Anderson",
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                    ),
-                    Text(
-                      "Reviewing item",
-                      style: TextStyle(color: Colors.grey, fontSize: 14),
-                    ),
-                  ],
-                ),
-              ],
+            buildProductCard(),
+            const Text(
+              "Rate this product:",
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 20),
-            Container(
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Row(
-                children: [
-                  ClipRRect(
-                    child: Image.asset(
-                      widget.imagePath,
-                      width: 60,
-                      height: 60,
-                    ),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          widget.title,
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 15),
-                        ),
-                        Text(
-                          "From: Michael Smith",
-                          style: TextStyle(
-                              color: Colors.grey,
-                              fontSize: 13,
-                              overflow: TextOverflow.ellipsis),
-                        ),
-                      ],
-                    ),
-                  )
-                ],
-              ),
-            ),
-            const SizedBox(height: 20),
-            const Text("Rate your experience",
-                style: TextStyle(fontWeight: FontWeight.bold)),
-            const SizedBox(height: 6),
+            const SizedBox(height: 10),
             RatingBar.builder(
-              initialRating: rating,
+              initialRating: _rating,
               minRating: 1,
               direction: Axis.horizontal,
-              allowHalfRating: true,
+              allowHalfRating: false,
               itemCount: 5,
-              itemSize: 32,
-              glowColor: Colors.amber,
-              unratedColor: const Color(0xffE0D4C5),
               itemPadding: const EdgeInsets.symmetric(horizontal: 4),
               itemBuilder: (context, _) =>
                   const Icon(Icons.star, color: Colors.amber),
-              onRatingUpdate: (value) {
-                setState(() {
-                  rating = value;
-                });
-              },
-            ),
-            const SizedBox(height: 20),
-            const Text("Write your review",
-                style: TextStyle(fontWeight: FontWeight.bold)),
-            const SizedBox(height: 6),
-            TextFormField(
-              controller: _reviewController,
-              maxLines: 4,
-              decoration: InputDecoration(
-                hintText:
-                    "Share your experience about the item and the swap process",
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: Color(0xffE5DDD3), width: 1),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: Color(0xffE5DDD3), width: 1),
-                ),
-                fillColor: Colors.white,
-                filled: true,
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-              ),
-            ),
-            const SizedBox(height: 20),
-            const Text("Add photos",
-                style: TextStyle(fontWeight: FontWeight.bold)),
-            const SizedBox(height: 10),
-            Wrap(
-              spacing: 10,
-              runSpacing: 10,
-              children: [
-                InkWell(
-                  onTap: _pickImage,
-                  child: DottedBorder(
-                    color: Color(0xffB8A69B),
-                    strokeWidth: 1,
-                    dashPattern: [6, 3],
-                    borderType: BorderType.RRect,
-                    radius: Radius.circular(12),
-                    child: Container(
-                      width: 80,
-                      height: 80,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        color: Color(0xffF5F3F1),
-                      ),
-                      child: const Center(
-                          child:
-                              Icon(Icons.camera_alt, color: Color(0xffB8A69B))),
-                    ),
-                  ),
-                ),
-                ...List.generate(_selectedImages.length, (index) {
-                  return Stack(
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: Image.file(
-                          _selectedImages[index],
-                          width: 80,
-                          height: 80,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                      Positioned(
-                        top: -10,
-                        right: -10,
-                        child: IconButton(
-                          icon: const Icon(Icons.cancel, color: Colors.white),
-                          onPressed: () => _removeImage(index),
-                          style: IconButton.styleFrom(
-                              minimumSize: const Size(28, 28)),
-                        ),
-                      ),
-                    ],
-                  );
-                }),
-              ],
+              onRatingUpdate: (rating) => setState(() => _rating = rating),
             ),
             const SizedBox(height: 30),
+            const Text(
+              "Write your comment:",
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            TextField(
+              controller: _commentController,
+              maxLines: 4,
+              decoration: InputDecoration(
+                hintText: "Type your feedback here...",
+                filled: true,
+                fillColor: Colors.white,
+                contentPadding: const EdgeInsets.all(12),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+            ),
+            const SizedBox(height: 30),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: _submitReview,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xff694A38),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: const Text(
+                  "Submit Review",
+                  style: TextStyle(fontSize: 16, color: Colors.white),
+                ),
+              ),
+            ),
           ],
-        ),
-      ),
-      bottomNavigationBar: Container(
-        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-                color: Colors.grey.withOpacity(0.2),
-                spreadRadius: 2,
-                blurRadius: 5),
-          ],
-        ),
-        child: ElevatedButton(
-          onPressed: () => _submitReview(context),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Color(0xff694A38),
-            elevation: 0,
-            minimumSize: Size(double.infinity, 48),
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          ),
-          child: Text("Submit Review",
-              style: TextStyle(color: Colors.white, fontSize: 16)),
         ),
       ),
     );

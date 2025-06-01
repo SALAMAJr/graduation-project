@@ -1,6 +1,9 @@
 import 'package:dartz/dartz.dart';
+import 'package:dio/dio.dart';
 import 'package:furniswap/core/errors/failures.dart';
 import 'package:furniswap/data/api_services/api_service.dart';
+import 'package:furniswap/data/models/auth/ResetPasswordRequestModel.dart';
+import 'package:furniswap/data/models/auth/ResetPasswordResponseModel.dart';
 import 'package:furniswap/data/models/auth/login_response/login_response.dart';
 import 'package:furniswap/data/models/auth/signup_response/register.response.dart';
 import 'package:furniswap/data/repository/auth_repo.dart';
@@ -69,6 +72,57 @@ class AuthRepoImpl implements AuthRepo {
       return right(response['message'] ?? 'FCM token sent successfully');
     } catch (e) {
       return left(ServerFailure(message: e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, String>> sendForgotPasswordOtp(String email) async {
+    try {
+      final response = await apiService.post(
+        endPoint: '/auth/forgot-password',
+        data: {"email": email},
+      );
+
+      return right(response['email']);
+    } catch (e) {
+      return left(ServerFailure(message: e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, ResetPasswordResponseModel>> resetPassword(
+      ResetPasswordRequestModel model) async {
+    try {
+      print('🚀 Sending reset password request with: ${model.toJson()}');
+
+      final response = await apiService.patch(
+        endPoint: '/auth/reset-password',
+        data: model.toJson(),
+      );
+
+      print('✅ Response received: $response');
+
+      final result = ResetPasswordResponseModel.fromJson(response);
+
+      print('📦 Parsed model: ${result.message}');
+
+      return right(result);
+    } catch (e) {
+      if (e is DioException) {
+        print('❌ DioException caught:');
+        print('📍 URL: ${e.requestOptions.uri}');
+        print('📦 Sent Data: ${e.requestOptions.data}');
+        print('📄 Response: ${e.response?.data}');
+        print('📊 Status Code: ${e.response?.statusCode}');
+        print('🧾 Headers: ${e.requestOptions.headers}');
+      } else {
+        print('❌ Unknown error: $e');
+      }
+
+      return left(
+        ServerFailure(
+            message: "خطأ أثناء إعادة تعيين كلمة المرور: ${e.toString()}"),
+      );
     }
   }
 }

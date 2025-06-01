@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
-import 'package:http_parser/http_parser.dart'; // ✅ استيراد مهم
+import 'package:http_parser/http_parser.dart';
 
 class ApiService {
   final _baseUrl = "http://63.177.194.209:3001";
@@ -10,15 +10,18 @@ class ApiService {
 
   Future<Map<String, dynamic>> get({
     required String endPoint,
-    Map<String, String>? headers, // ✅ تمت الإضافة
+    Map<String, String>? headers,
   }) async {
     try {
       var response = await _dio.get(
         '$_baseUrl$endPoint',
-        options: Options(headers: headers), // ✅ استخدامها
+        options: Options(headers: headers),
       );
       return response.data;
     } on DioException catch (e) {
+      print("❌ GET request error: ${e.message}");
+      print("📍 URL: $_baseUrl$endPoint");
+      print("📄 Response: ${e.response?.data}");
       throw e;
     }
   }
@@ -29,6 +32,8 @@ class ApiService {
     Map<String, String>? headers,
   }) async {
     try {
+      print("🚀 POST to $_baseUrl$endPoint");
+      print("📦 Data: $data");
       var response = await _dio.post(
         '$_baseUrl$endPoint',
         data: data,
@@ -36,6 +41,10 @@ class ApiService {
       );
       return response.data;
     } on DioException catch (e) {
+      print("❌ POST request error: ${e.message}");
+      print("📍 URL: $_baseUrl$endPoint");
+      print("📦 Sent Data: $data");
+      print("📄 Response: ${e.response?.data}");
       throw e;
     }
   }
@@ -53,6 +62,9 @@ class ApiService {
       );
       return response.data;
     } on DioException catch (e) {
+      print("❌ PATCH request error: ${e.message}");
+      print("📍 URL: $_baseUrl$endPoint");
+      print("📄 Response: ${e.response?.data}");
       throw e;
     }
   }
@@ -83,9 +95,11 @@ class ApiService {
           contentType: 'multipart/form-data',
         ),
       );
-
       return response.data;
     } on DioException catch (e) {
+      print("❌ POST multipart error: ${e.message}");
+      print("📍 URL: $_baseUrl$endPoint");
+      print("📄 Response: ${e.response?.data}");
       throw e;
     }
   }
@@ -116,9 +130,11 @@ class ApiService {
           contentType: 'multipart/form-data',
         ),
       );
-
       return response.data;
     } on DioException catch (e) {
+      print("❌ PATCH multipart error: ${e.message}");
+      print("📍 URL: $_baseUrl$endPoint");
+      print("📄 Response: ${e.response?.data}");
       throw e;
     }
   }
@@ -132,9 +148,11 @@ class ApiService {
         '$_baseUrl$endPoint',
         options: Options(headers: headers),
       );
-
       return response.data;
     } on DioException catch (e) {
+      print("❌ DELETE request error: ${e.message}");
+      print("📍 URL: $_baseUrl$endPoint");
+      print("📄 Response: ${e.response?.data}");
       throw e;
     }
   }

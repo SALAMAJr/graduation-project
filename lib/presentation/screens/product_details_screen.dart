@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:furniswap/icons/icons.dart';
 import 'package:furniswap/presentation/screens/messages_list_screen.dart';
 import 'package:furniswap/presentation/screens/notifications_screen.dart';
+import 'package:furniswap/presentation/screens/create_review_screen.dart';
 
 class ProductDetailsScreen extends StatefulWidget {
   @override
@@ -40,7 +41,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 builder: (BuildContext context) {
                   return Container(
                     width: double.infinity,
-                    margin: EdgeInsets.zero,
                     child: Image.asset(
                       image,
                       fit: BoxFit.cover,
@@ -118,11 +118,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   MaterialPageRoute(
                       builder: (context) => NotificationsScreen()));
             },
-            style: TextButton.styleFrom(
-              padding: EdgeInsets.symmetric(horizontal: 3),
-              minimumSize: Size.zero,
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            ),
           ),
           IconButton(
             icon: const Icon(Icons.sms_outlined, color: Color(0xff694A38)),
@@ -132,11 +127,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   MaterialPageRoute(
                       builder: (context) => MessagesListScreen()));
             },
-            style: TextButton.styleFrom(
-              padding: EdgeInsets.only(left: 3, right: 8),
-              minimumSize: Size.zero,
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            ),
           ),
         ],
       ),
@@ -144,10 +134,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              height: 250,
-              child: buildImageGallerySection(),
-            ),
+            buildImageGallerySection(),
             SizedBox(height: 8),
             Padding(
               padding: const EdgeInsets.all(16.0),
@@ -241,7 +228,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
         ),
       ),
       bottomNavigationBar: Container(
-        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
         decoration: BoxDecoration(
           color: Colors.white,
           boxShadow: [
@@ -254,7 +241,42 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
         ),
         child: Row(
           children: [
-            Expanded(
+            Flexible(
+              flex: 1,
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const CreateReviewScreen(),
+                    ),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  elevation: 5,
+                  minimumSize: Size(double.infinity, 48),
+                  backgroundColor: Color(0xffFDE68A),
+                  shadowColor: Colors.black26,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: FittedBox(
+                  child: Row(
+                    children: [
+                      Icon(Icons.rate_review_outlined,
+                          color: Color(0xff92400E), size: 18),
+                      SizedBox(width: 4),
+                      Text("Review",
+                          style: TextStyle(color: Color(0xff92400E))),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(width: 8),
+            Flexible(
+              flex: 1,
               child: ElevatedButton(
                 onPressed: () {},
                 style: ElevatedButton.styleFrom(
@@ -266,21 +288,22 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Icon(Icons.messenger_outline,
-                        color: Color(0xff374151), size: 18),
-                    Text(
-                      "Message",
-                      style: TextStyle(color: Color(0xff374151)),
-                    ),
-                  ],
+                child: FittedBox(
+                  child: Row(
+                    children: [
+                      Icon(Icons.messenger_outline,
+                          color: Color(0xff374151), size: 18),
+                      SizedBox(width: 4),
+                      Text("Message",
+                          style: TextStyle(color: Color(0xff374151))),
+                    ],
+                  ),
                 ),
               ),
             ),
-            SizedBox(width: 12),
-            Expanded(
+            SizedBox(width: 8),
+            Flexible(
+              flex: 1,
               child: ElevatedButton(
                 onPressed: () {},
                 style: ElevatedButton.styleFrom(
@@ -292,15 +315,14 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Icon(MyFlutterApp.swap, color: Colors.white, size: 16),
-                    Text(
-                      "Offer Swap",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ],
+                child: FittedBox(
+                  child: Row(
+                    children: [
+                      Icon(MyFlutterApp.swap, color: Colors.white, size: 16),
+                      SizedBox(width: 4),
+                      Text("Swap", style: TextStyle(color: Colors.white)),
+                    ],
+                  ),
                 ),
               ),
             ),

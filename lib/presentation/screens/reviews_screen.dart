@@ -1,6 +1,3 @@
-// ❌ شيلنا import الخاص بـ Bloc
-// ❌ شيلنا import الخاص بـ ReviewCubit و ReviewState
-
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:furniswap/presentation/screens/edit_review_screen.dart';
@@ -65,10 +62,7 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
           final newReview = await Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => CreateReviewScreen(
-                imagePath: "assets/images/Bookshelf.png",
-                title: "Bookshelf",
-              ),
+              builder: (context) => CreateReviewScreen(),
             ),
           );
           if (newReview != null) {
@@ -122,10 +116,7 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                         final newReview = await Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => CreateReviewScreen(
-                              imagePath: "assets/images/Bookshelf.png",
-                              title: "Bookshelf",
-                            ),
+                            builder: (context) => CreateReviewScreen(),
                           ),
                         );
                         if (newReview != null) {
