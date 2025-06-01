@@ -1,6 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:furniswap/data/models/auth/ResetPasswordRequestModel.dart';
+import 'package:furniswap/data/models/auth/reset_password/ResetPasswordRequestModel.dart';
 import 'package:furniswap/core/errors/failures.dart';
 import 'package:furniswap/data/repository/auth_repo.dart';
 

@@ -1,4 +1,4 @@
-import 'package:furniswap/data/socket/socket_service.dart';
+import 'package:furniswap/data/repository/socket/socket_service.dart';
 import 'package:hive/hive.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 

@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:dartz/dartz.dart';
 import 'package:furniswap/core/errors/failures.dart';
-import 'package:furniswap/data/socket/socket_service.dart';
+import 'package:furniswap/data/repository/socket/socket_service.dart';
 import 'package:furniswap/data/models/socketModel/chat_message_model.dart';
 import 'chat_repo.dart';
 

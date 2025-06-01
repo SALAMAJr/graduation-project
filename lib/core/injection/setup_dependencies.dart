@@ -4,12 +4,12 @@ import 'package:furniswap/data/repository/auth_repo.dart';
 import 'package:furniswap/data/repository/createproducts/ProductRepoImpl.dart';
 import 'package:get_it/get_it.dart';
 
-import 'package:furniswap/data/socket/socket_service.dart';
+import 'package:furniswap/data/repository/socket/socket_service.dart';
 import 'package:furniswap/data/repository/auth_repoImpl.dart';
 import 'package:furniswap/data/repository/chating/chat_repo.dart';
 import 'package:furniswap/data/repository/chating/chat_repo_impl.dart';
 import 'package:furniswap/data/repository/createproducts/product_repo.dart';
-import 'package:furniswap/data/socket/socket_service_impl.dart';
+import 'package:furniswap/data/repository/socket/socket_service_impl.dart';
 import 'package:furniswap/presentation/manager/cubit/product_cubit.dart';
 import 'package:furniswap/presentation/manager/cubit/forgot_password_cubit.dart';
 import 'package:furniswap/presentation/manager/cubit/reset_password_cubit.dart';
