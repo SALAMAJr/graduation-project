@@ -1,4 +1,6 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:furniswap/presentation/screens/messages_list_screen.dart';
 import 'package:furniswap/presentation/screens/notifications_screen.dart';
 
@@ -10,16 +12,14 @@ class AccountSettingsScreen extends StatefulWidget {
 }
 
 class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
-  final _emailController =
-      TextEditingController(text: 'sarahmitchell@gmail.com');
   final _firstNameController = TextEditingController(text: 'Sarah');
   final _lastNameController = TextEditingController(text: 'Mitchell');
-  final _dobController = TextEditingController(text: '1/10/2003');
-  String _gender = 'Female';
+  final _dobController = TextEditingController(text: '2003-10-01');
+  File? _selectedImage;
+  bool _isPickingImage = false;
 
   @override
   void dispose() {
-    _emailController.dispose();
     _firstNameController.dispose();
     _lastNameController.dispose();
     _dobController.dispose();
@@ -50,28 +50,55 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
     );
     if (picked != null) {
       setState(() {
-        _dobController.text = "${picked.day}/${picked.month}/${picked.year}";
+        _dobController.text =
+            "${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}";
+      });
+    }
+  }
+
+  Future<void> _pickImage() async {
+    if (_isPickingImage) return;
+
+    setState(() {
+      _isPickingImage = true;
+    });
+
+    try {
+      final ImagePicker picker = ImagePicker();
+      final XFile? pickedFile =
+          await picker.pickImage(source: ImageSource.gallery);
+      if (pickedFile != null) {
+        setState(() {
+          _selectedImage = File(pickedFile.path);
+        });
+      }
+    } catch (e) {
+      print('Image picking error: $e');
+    } finally {
+      setState(() {
+        _isPickingImage = false;
       });
     }
   }
 
   void _saveChanges() {
-    String email = _emailController.text;
     String firstName = _firstNameController.text;
     String lastName = _lastNameController.text;
     String dob = _dobController.text;
-    String gender = _gender;
-    print('Saved: $email, $firstName, $lastName, $dob, $gender');
+    File? image = _selectedImage;
+
+    print('Saved: $firstName, $lastName, $dob');
+    print('Image path: ${image?.path}');
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xffF5EFE6),
+      backgroundColor: const Color(0xffF5EFE6),
       appBar: AppBar(
         backgroundColor: Colors.white,
         centerTitle: true,
-        title: Text(
+        title: const Text(
           "Account Settings",
           style: TextStyle(
             color: Color(0xff694A38),
@@ -84,30 +111,16 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
             icon:
                 const Icon(Icons.notifications_none, color: Color(0xff694A38)),
             onPressed: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => NotificationsScreen()));
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (_) => NotificationsScreen()));
             },
-            style: TextButton.styleFrom(
-              padding: EdgeInsets.symmetric(horizontal: 3),
-              minimumSize: Size.zero,
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            ),
           ),
           IconButton(
             icon: const Icon(Icons.sms_outlined, color: Color(0xff694A38)),
             onPressed: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => MessagesListScreen()));
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (_) => MessagesListScreen()));
             },
-            style: TextButton.styleFrom(
-              padding: EdgeInsets.only(left: 3, right: 8),
-              minimumSize: Size.zero,
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            ),
           ),
         ],
       ),
@@ -116,36 +129,40 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
         child: Column(
           children: [
             const SizedBox(height: 16),
-            Row(
-              children: const [
-                CircleAvatar(
-                  backgroundImage: AssetImage("assets/images/Avatar.png"),
-                  radius: 30,
-                ),
-                SizedBox(width: 10),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text("Sarah Mitchell",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                            color: Color(0xff4A3C2E))),
-                    Text("sarahmitchell@gmail.com",
-                        style:
-                            TextStyle(color: Color(0xff8B7355), fontSize: 14)),
-                  ],
-                ),
-              ],
+            GestureDetector(
+              onTap: _pickImage,
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    radius: 30,
+                    backgroundImage: _selectedImage != null
+                        ? FileImage(_selectedImage!)
+                        : const AssetImage("assets/images/Avatar.png")
+                            as ImageProvider,
+                  ),
+                  const SizedBox(width: 10),
+                  const Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("Sarah Mitchell",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                              color: Color(0xff4A3C2E))),
+                      Text("sarahmitchell@gmail.com",
+                          style: TextStyle(
+                              color: Color(0xff8B7355), fontSize: 14)),
+                    ],
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 24),
-            _buildTextField(label: 'Email', controller: _emailController),
             _buildTextField(
                 label: 'First Name', controller: _firstNameController),
             _buildTextField(
                 label: 'Last Name', controller: _lastNameController),
             _buildDateField(label: 'Date of birth', controller: _dobController),
-            _buildDropdownField(label: 'Gender'),
             const SizedBox(height: 16),
           ],
         ),
@@ -194,11 +211,13 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
                   const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: Color(0xffE8E2D9), width: 1),
+                borderSide:
+                    const BorderSide(color: Color(0xffE8E2D9), width: 1),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: Color(0xffE8E2D9), width: 1),
+                borderSide:
+                    const BorderSide(color: Color(0xffE8E2D9), width: 1),
               ),
             ),
           ),
@@ -230,56 +249,15 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
                   const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: Color(0xffE8E2D9), width: 1),
+                borderSide:
+                    const BorderSide(color: Color(0xffE8E2D9), width: 1),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: Color(0xffE8E2D9), width: 1),
+                borderSide:
+                    const BorderSide(color: Color(0xffE8E2D9), width: 1),
               ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDropdownField({required String label}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(label,
-              style: const TextStyle(
-                  fontWeight: FontWeight.bold, color: Color(0xFF6D4C41))),
-          const SizedBox(height: 4),
-          DropdownButtonFormField<String>(
-            value: _gender,
-            dropdownColor: Colors.white,
-            icon: Icon(Icons.keyboard_arrow_down_outlined),
-            decoration: InputDecoration(
-              filled: true,
-              fillColor: Colors.white,
-              contentPadding:
-                  const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: Color(0xffE8E2D9), width: 1),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: Color(0xffE8E2D9), width: 1),
-              ),
-            ),
-            items: const [
-              DropdownMenuItem(value: 'Female', child: Text('Female')),
-              DropdownMenuItem(value: 'Male', child: Text('Male')),
-            ],
-            onChanged: (value) {
-              setState(() {
-                _gender = value!;
-              });
-            },
           ),
         ],
       ),

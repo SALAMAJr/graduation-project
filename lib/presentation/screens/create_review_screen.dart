@@ -82,7 +82,8 @@ class _CreateReviewScreenState extends State<CreateReviewScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Create Review"),
+        title: const Text("Create Review",
+            style: TextStyle(fontSize: 20, color: Colors.white)),
         backgroundColor: const Color(0xff694A38),
         centerTitle: true,
       ),
