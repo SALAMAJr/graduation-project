@@ -23,6 +23,7 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
 
   File? _selectedImage;
   bool _isPickingImage = false;
+  bool _isUpdating = false;
 
   @override
   void initState() {
@@ -57,30 +58,24 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
 
   Future<void> _pickImage() async {
     if (_isPickingImage) return;
-
-    setState(() {
-      _isPickingImage = true;
-    });
+    setState(() => _isPickingImage = true);
 
     try {
-      final ImagePicker picker = ImagePicker();
+      final picker = ImagePicker();
       final XFile? pickedFile =
           await picker.pickImage(source: ImageSource.gallery);
       if (pickedFile != null) {
-        setState(() {
-          _selectedImage = File(pickedFile.path);
-        });
+        setState(() => _selectedImage = File(pickedFile.path));
       }
     } catch (e) {
       print('Image picking error: $e');
     } finally {
-      setState(() {
-        _isPickingImage = false;
-      });
+      setState(() => _isPickingImage = false);
     }
   }
 
   void _saveChanges() {
+    setState(() => _isUpdating = true);
     final userCubit = context.read<UserCubit>();
     userCubit.updateUser(
       data: UpdateUserRequestModel(
@@ -111,13 +106,17 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
           IconButton(
             icon:
                 const Icon(Icons.notifications_none, color: Color(0xff694A38)),
-            onPressed: () => Navigator.push(context,
-                MaterialPageRoute(builder: (_) => NotificationsScreen())),
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => NotificationsScreen()),
+            ),
           ),
           IconButton(
             icon: const Icon(Icons.sms_outlined, color: Color(0xff694A38)),
-            onPressed: () => Navigator.push(context,
-                MaterialPageRoute(builder: (_) => MessagesListScreen())),
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => MessagesListScreen()),
+            ),
           ),
         ],
       ),
@@ -127,7 +126,16 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text("❌ ${state.message}")),
             );
-          } else if (state is UserLoaded) {
+          } else if (state is UserLoaded && _isUpdating) {
+            setState(() {
+              _firstNameController.text = state.user.firstName;
+              _lastNameController.text = state.user.lastName;
+              _dobController.text = state.user.dateOfBirth;
+              _emailController.text = state.user.email;
+              _phoneController.text = state.user.phone;
+              _isUpdating = false;
+            });
+
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text("✅ Profile updated successfully!")),
             );
@@ -138,11 +146,14 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
             return const Center(child: CircularProgressIndicator());
           } else if (state is UserLoaded) {
             final user = state.user;
-            _firstNameController.text = user.firstName;
-            _lastNameController.text = user.lastName;
-            _dobController.text = user.dateOfBirth;
-            _emailController.text = user.email;
-            _phoneController.text = user.phone;
+
+            if (!_isUpdating) {
+              _firstNameController.text = user.firstName;
+              _lastNameController.text = user.lastName;
+              _dobController.text = user.dateOfBirth;
+              _emailController.text = user.email;
+              _phoneController.text = user.phone;
+            }
 
             return SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 16),
