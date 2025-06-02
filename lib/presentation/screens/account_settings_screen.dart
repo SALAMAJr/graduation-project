@@ -1,8 +1,11 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:furniswap/presentation/manager/cubit/user_details_cubit.dart';
 import 'package:furniswap/presentation/screens/messages_list_screen.dart';
 import 'package:furniswap/presentation/screens/notifications_screen.dart';
+import 'package:furniswap/data/models/UserModel/UpdateUserRequestModel.dart';
 
 class AccountSettingsScreen extends StatefulWidget {
   const AccountSettingsScreen({super.key});
@@ -12,41 +15,37 @@ class AccountSettingsScreen extends StatefulWidget {
 }
 
 class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
-  final _firstNameController = TextEditingController(text: 'Sarah');
-  final _lastNameController = TextEditingController(text: 'Mitchell');
-  final _dobController = TextEditingController(text: '2003-10-01');
+  final _firstNameController = TextEditingController();
+  final _lastNameController = TextEditingController();
+  final _dobController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _phoneController = TextEditingController();
+
   File? _selectedImage;
   bool _isPickingImage = false;
+
+  @override
+  void initState() {
+    super.initState();
+    context.read<UserCubit>().fetchUserData();
+  }
 
   @override
   void dispose() {
     _firstNameController.dispose();
     _lastNameController.dispose();
     _dobController.dispose();
+    _emailController.dispose();
+    _phoneController.dispose();
     super.dispose();
   }
 
   Future<void> _selectDate(BuildContext context) async {
     DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: DateTime(2003, 10, 1),
+      initialDate: DateTime.now(),
       firstDate: DateTime(1900),
       lastDate: DateTime(2100),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
-              primary: Color(0xFF6D4C41),
-              onPrimary: Colors.white,
-              onSurface: Color(0xFF4A3C2E),
-            ),
-            textButtonTheme: TextButtonThemeData(
-              style: TextButton.styleFrom(foregroundColor: Color(0xFF6D4C41)),
-            ),
-          ),
-          child: child!,
-        );
-      },
     );
     if (picked != null) {
       setState(() {
@@ -82,13 +81,15 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
   }
 
   void _saveChanges() {
-    String firstName = _firstNameController.text;
-    String lastName = _lastNameController.text;
-    String dob = _dobController.text;
-    File? image = _selectedImage;
-
-    print('Saved: $firstName, $lastName, $dob');
-    print('Image path: ${image?.path}');
+    final userCubit = context.read<UserCubit>();
+    userCubit.updateUser(
+      data: UpdateUserRequestModel(
+        firstName: _firstNameController.text.trim(),
+        lastName: _lastNameController.text.trim(),
+        dateOfBirth: _dobController.text.trim(),
+      ),
+      image: _selectedImage,
+    );
   }
 
   @override
@@ -110,62 +111,95 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
           IconButton(
             icon:
                 const Icon(Icons.notifications_none, color: Color(0xff694A38)),
-            onPressed: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (_) => NotificationsScreen()));
-            },
+            onPressed: () => Navigator.push(context,
+                MaterialPageRoute(builder: (_) => NotificationsScreen())),
           ),
           IconButton(
             icon: const Icon(Icons.sms_outlined, color: Color(0xff694A38)),
-            onPressed: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (_) => MessagesListScreen()));
-            },
+            onPressed: () => Navigator.push(context,
+                MaterialPageRoute(builder: (_) => MessagesListScreen())),
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: Column(
-          children: [
-            const SizedBox(height: 16),
-            GestureDetector(
-              onTap: _pickImage,
-              child: Row(
+      body: BlocConsumer<UserCubit, UserState>(
+        listener: (context, state) {
+          if (state is UserError) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text("❌ ${state.message}")),
+            );
+          } else if (state is UserLoaded) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("✅ Profile updated successfully!")),
+            );
+          }
+        },
+        builder: (context, state) {
+          if (state is UserLoading) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (state is UserLoaded) {
+            final user = state.user;
+            _firstNameController.text = user.firstName;
+            _lastNameController.text = user.lastName;
+            _dobController.text = user.dateOfBirth;
+            _emailController.text = user.email;
+            _phoneController.text = user.phone;
+
+            return SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
                 children: [
-                  CircleAvatar(
-                    radius: 30,
-                    backgroundImage: _selectedImage != null
-                        ? FileImage(_selectedImage!)
-                        : const AssetImage("assets/images/Avatar.png")
-                            as ImageProvider,
+                  const SizedBox(height: 16),
+                  GestureDetector(
+                    onTap: _pickImage,
+                    child: Row(
+                      children: [
+                        CircleAvatar(
+                          radius: 30,
+                          backgroundImage: _selectedImage != null
+                              ? FileImage(_selectedImage!)
+                              : NetworkImage(user.image) as ImageProvider,
+                        ),
+                        const SizedBox(width: 10),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text("${user.firstName} ${user.lastName}",
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                    color: Color(0xff4A3C2E))),
+                            Text(user.email,
+                                style: const TextStyle(
+                                    color: Color(0xff8B7355), fontSize: 14)),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
-                  const SizedBox(width: 10),
-                  const Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("Sarah Mitchell",
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                              color: Color(0xff4A3C2E))),
-                      Text("sarahmitchell@gmail.com",
-                          style: TextStyle(
-                              color: Color(0xff8B7355), fontSize: 14)),
-                    ],
-                  ),
+                  const SizedBox(height: 24),
+                  _buildTextField(
+                      label: 'First Name', controller: _firstNameController),
+                  _buildTextField(
+                      label: 'Last Name', controller: _lastNameController),
+                  _buildDateField(
+                      label: 'Date of birth', controller: _dobController),
+                  _buildTextField(
+                      label: 'Email',
+                      controller: _emailController,
+                      isEnabled: false),
+                  _buildTextField(
+                      label: 'Phone',
+                      controller: _phoneController,
+                      isEnabled: false),
+                  const SizedBox(height: 16),
                 ],
               ),
-            ),
-            const SizedBox(height: 24),
-            _buildTextField(
-                label: 'First Name', controller: _firstNameController),
-            _buildTextField(
-                label: 'Last Name', controller: _lastNameController),
-            _buildDateField(label: 'Date of birth', controller: _dobController),
-            const SizedBox(height: 16),
-          ],
-        ),
+            );
+          } else if (state is UserError) {
+            return Center(child: Text("❌ ${state.message}"));
+          }
+          return const SizedBox.shrink();
+        },
       ),
       bottomNavigationBar: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -191,8 +225,11 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
     );
   }
 
-  Widget _buildTextField(
-      {required String label, required TextEditingController controller}) {
+  Widget _buildTextField({
+    required String label,
+    required TextEditingController controller,
+    bool isEnabled = true,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Column(
@@ -204,9 +241,10 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
           const SizedBox(height: 4),
           TextFormField(
             controller: controller,
+            enabled: isEnabled,
             decoration: InputDecoration(
               filled: true,
-              fillColor: Colors.white,
+              fillColor: isEnabled ? Colors.white : const Color(0xFFE8E2D9),
               contentPadding:
                   const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
               enabledBorder: OutlineInputBorder(
@@ -226,8 +264,10 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
     );
   }
 
-  Widget _buildDateField(
-      {required String label, required TextEditingController controller}) {
+  Widget _buildDateField({
+    required String label,
+    required TextEditingController controller,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Column(

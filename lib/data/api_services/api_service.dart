@@ -13,15 +13,32 @@ class ApiService {
     Map<String, String>? headers,
   }) async {
     try {
+      final url = '$_baseUrl$endPoint';
+
+      print("🌍 Sending GET request to: $url");
+      print("📩 Headers: $headers");
+
       var response = await _dio.get(
-        '$_baseUrl$endPoint',
+        url,
         options: Options(headers: headers),
       );
+
+      print("✅ GET request success");
+      print("📊 Status Code: ${response.statusCode}");
+      print("📄 Response Data: ${response.data}");
+
       return response.data;
     } on DioException catch (e) {
-      print("❌ GET request error: ${e.message}");
+      print("❌ DioException caught in GET");
       print("📍 URL: $_baseUrl$endPoint");
-      print("📄 Response: ${e.response?.data}");
+      print("🪪 Headers: $headers");
+      print("📄 Error Message: ${e.message}");
+      print("📊 Status Code: ${e.response?.statusCode}");
+      print("📄 Response Data: ${e.response?.data}");
+      print("📎 Full Response: ${e.response}");
+      throw e;
+    } catch (e) {
+      print("❌ Unknown error in GET: $e");
       throw e;
     }
   }

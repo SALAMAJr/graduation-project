@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:furniswap/presentation/manager/cubit/user_details_cubit.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import 'package:furniswap/core/injection/setup_dependencies.dart';
@@ -9,6 +10,7 @@ import 'package:furniswap/data/repository/auth_repo.dart';
 import 'package:furniswap/data/repository/createproducts/product_repo.dart';
 import 'package:furniswap/data/repository/chating/chat_repo.dart';
 
+// Cubits
 import 'package:furniswap/presentation/manager/cubit/sign_up_cubit.dart';
 import 'package:furniswap/presentation/manager/cubit/login_cubit.dart';
 import 'package:furniswap/presentation/manager/cubit/product_cubit.dart';
@@ -70,6 +72,9 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (_) => ProductCubit(productRepo)),
         BlocProvider(create: (_) => getIt<ForgotPasswordCubit>()),
         BlocProvider(create: (_) => getIt<ResetPasswordCubit>()),
+
+        // ✅ New: Provide UserCubit here
+        BlocProvider(create: (_) => getIt<UserCubit>()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
