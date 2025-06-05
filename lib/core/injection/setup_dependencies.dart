@@ -16,11 +16,14 @@ import 'package:furniswap/data/repository/socket/socket_service.dart';
 import 'package:furniswap/data/repository/socket/socket_service_impl.dart';
 import 'package:furniswap/data/repository/chating/chat_repo.dart';
 import 'package:furniswap/data/repository/chating/chat_repo_impl.dart';
+import 'package:furniswap/data/repository/createproducts/product_search_repo.dart';
+import 'package:furniswap/data/repository/createproducts/product_search_repo_impl.dart';
 
 // Cubits
 import 'package:furniswap/presentation/manager/cubit/product_cubit.dart';
 import 'package:furniswap/presentation/manager/cubit/forgot_password_cubit.dart';
 import 'package:furniswap/presentation/manager/cubit/reset_password_cubit.dart';
+import 'package:furniswap/presentation/manager/cubit/product_search_cubit.dart';
 
 final getIt = GetIt.instance;
 
@@ -33,6 +36,8 @@ void setupDependencies() {
   getIt.registerLazySingleton<AuthRepo>(() => AuthRepoImpl(apiService));
   getIt.registerLazySingleton<ProductRepo>(() => ProductRepoImpl(apiService));
   getIt.registerLazySingleton<UserRepo>(() => UserRepoImpl(apiService));
+  getIt.registerLazySingleton<ProductSearchRepo>(
+      () => ProductSearchRepoImpl(apiService));
 
   // ✅ Register Socket & Chat Repos
   getIt.registerLazySingleton<SocketService>(() => SocketServiceImpl());
@@ -46,4 +51,6 @@ void setupDependencies() {
       () => ForgotPasswordCubit(getIt<AuthRepo>()));
   getIt.registerFactory<ResetPasswordCubit>(
       () => ResetPasswordCubit(getIt<AuthRepo>()));
+  getIt.registerFactory<ProductSearchCubit>(
+      () => ProductSearchCubit(getIt<ProductSearchRepo>()));
 }
