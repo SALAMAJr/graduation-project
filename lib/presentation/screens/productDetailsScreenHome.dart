@@ -1,25 +1,24 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:furniswap/data/models/createproduct/HomeModel%20.dart';
-import 'package:furniswap/data/models/createproduct/product_search_model.dart';
 import 'package:furniswap/icons/icons.dart';
 import 'package:furniswap/presentation/screens/create_review_screen.dart';
 import 'package:furniswap/presentation/screens/messages_list_screen.dart';
 import 'package:furniswap/presentation/screens/notifications_screen.dart';
 
-class ProductDetailsScreen extends StatefulWidget {
-  final ProductSearchModel product;
+class ProductDetailsScreenHome extends StatefulWidget {
+  final HomeModel product;
 
-  const ProductDetailsScreen({
+  const ProductDetailsScreenHome({
     super.key,
     required this.product,
   });
 
   @override
-  State<ProductDetailsScreen> createState() => _ProductDetailsScreenState();
+  State<ProductDetailsScreenHome> createState() => _ProductDetailsScreenState();
 }
 
-class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
+class _ProductDetailsScreenState extends State<ProductDetailsScreenHome> {
   late List<String> images;
   int _currentIndex = 0;
 

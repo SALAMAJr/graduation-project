@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
-import 'package:furniswap/data/repository/UseDetails/UserModelRepo.dart';
-import 'package:furniswap/data/repository/UseDetails/UserModelRepoImpl.dart';
-import 'package:furniswap/presentation/manager/cubit/user_details_cubit.dart';
+import 'package:furniswap/data/repository/createproducts/HomeRepoImpl.dart';
+import 'package:furniswap/data/repository/createproducts/homeRepo.dart';
+import 'package:furniswap/presentation/manager/cubit/home_cubit.dart';
 import 'package:get_it/get_it.dart';
 
 // API Services
@@ -12,18 +12,22 @@ import 'package:furniswap/data/repository/auth_repo.dart';
 import 'package:furniswap/data/repository/auth_repoImpl.dart';
 import 'package:furniswap/data/repository/createproducts/product_repo.dart';
 import 'package:furniswap/data/repository/createproducts/ProductRepoImpl.dart';
+import 'package:furniswap/data/repository/UseDetails/UserModelRepo.dart';
+import 'package:furniswap/data/repository/UseDetails/UserModelRepoImpl.dart';
+import 'package:furniswap/data/repository/createproducts/product_search_repo.dart';
+import 'package:furniswap/data/repository/createproducts/product_search_repo_impl.dart';
 import 'package:furniswap/data/repository/socket/socket_service.dart';
 import 'package:furniswap/data/repository/socket/socket_service_impl.dart';
 import 'package:furniswap/data/repository/chating/chat_repo.dart';
 import 'package:furniswap/data/repository/chating/chat_repo_impl.dart';
-import 'package:furniswap/data/repository/createproducts/product_search_repo.dart';
-import 'package:furniswap/data/repository/createproducts/product_search_repo_impl.dart';
 
 // Cubits
 import 'package:furniswap/presentation/manager/cubit/product_cubit.dart';
+import 'package:furniswap/presentation/manager/cubit/user_details_cubit.dart';
 import 'package:furniswap/presentation/manager/cubit/forgot_password_cubit.dart';
 import 'package:furniswap/presentation/manager/cubit/reset_password_cubit.dart';
 import 'package:furniswap/presentation/manager/cubit/product_search_cubit.dart';
+// HomeCubit (الجديد)
 
 final getIt = GetIt.instance;
 
@@ -38,6 +42,8 @@ void setupDependencies() {
   getIt.registerLazySingleton<UserRepo>(() => UserRepoImpl(apiService));
   getIt.registerLazySingleton<ProductSearchRepo>(
       () => ProductSearchRepoImpl(apiService));
+  getIt.registerLazySingleton<HomeRepo>(
+      () => HomeRepoImpl(apiService)); // << NEW
 
   // ✅ Register Socket & Chat Repos
   getIt.registerLazySingleton<SocketService>(() => SocketServiceImpl());
@@ -53,4 +59,6 @@ void setupDependencies() {
       () => ResetPasswordCubit(getIt<AuthRepo>()));
   getIt.registerFactory<ProductSearchCubit>(
       () => ProductSearchCubit(getIt<ProductSearchRepo>()));
+  getIt
+      .registerFactory<HomeCubit>(() => HomeCubit(getIt<HomeRepo>())); // << NEW
 }

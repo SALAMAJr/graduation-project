@@ -218,28 +218,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                 ),
               ],
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 15),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: TextField(
-                  decoration: InputDecoration(
-                    hintText: "Search furniture...",
-                    border: InputBorder.none,
-                    prefixIcon: Icon(Icons.search, color: Colors.black),
-                    suffixIcon: IconButton(
-                      icon:
-                          Icon(Icons.camera_alt_outlined, color: Colors.black),
-                      onPressed: () {},
-                    ),
-                    contentPadding: EdgeInsets.symmetric(vertical: 12),
-                  ),
-                ),
-              ),
-            ),
+            // السيرش بار اتمسح خلاص من هنا
             Padding(
               padding: const EdgeInsets.only(top: 6, bottom: 10),
               child: SizedBox(

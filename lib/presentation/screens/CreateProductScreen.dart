@@ -23,6 +23,32 @@ class _CreateProductScreenState extends State<CreateProductScreen> {
   final _typeOptions = ['buy', 'repair', 'swap'];
   final _statusOptions = ['available', 'on_hold', 'sold'];
 
+  // هنا الليست الجديدة
+  final List<String> categoryOptions = [
+    "Living Room",
+    "Bedroom",
+    "Dining & Kitchen",
+    "Home Office",
+    "Outdoor & Patio",
+    "Kids' & Nursery",
+    "Storage Furniture",
+    "Accent Furniture",
+    "Sofas & Sectionals",
+    "Beds & Headboards",
+    "Tables",
+    "Chairs",
+    "Bookshelves & Cabinets",
+    "Dressers & Chests",
+    "TV Stands & Media Consoles",
+    "Desks",
+    "Office Chairs",
+    "Patio Sets",
+    "Dining Sets",
+    "Mattresses",
+    "Other Furniture",
+  ];
+  String? _selectedCategory;
+
   String? _selectedCondition;
   String? _selectedType;
   String? _selectedStatus;
@@ -51,9 +77,11 @@ class _CreateProductScreenState extends State<CreateProductScreen> {
         _selectedCondition == null ||
         _selectedType == null ||
         _selectedStatus == null ||
-        _selectedImage == null) {
+        _selectedImage == null ||
+        _selectedCategory == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("من فضلك املا كل البيانات واختر صورة")),
+        const SnackBar(
+            content: Text("من فضلك املا كل البيانات واختر صورة وفئة")),
       );
       return;
     }
@@ -67,6 +95,7 @@ class _CreateProductScreenState extends State<CreateProductScreen> {
       type: _selectedType!,
       status: _selectedStatus!,
       imageUrl: null,
+      category: _selectedCategory!, // دي الفئة الجديدة
     );
 
     context.read<ProductCubit>().createProduct(product);
@@ -137,6 +166,9 @@ class _CreateProductScreenState extends State<CreateProductScreen> {
                       inputType: TextInputType.number),
                   _buildInput("Description", _descriptionController,
                       maxLines: 3),
+                  // Dropdown الفئة الجديدة
+                  _buildDropdown("Category", categoryOptions, _selectedCategory,
+                      (val) => setState(() => _selectedCategory = val)),
                   _buildDropdown(
                       "Condition",
                       _conditionOptions,
@@ -203,7 +235,7 @@ class _CreateProductScreenState extends State<CreateProductScreen> {
         items: items
             .map((item) => DropdownMenuItem(
                   value: item,
-                  child: Text(item[0].toUpperCase() + item.substring(1)),
+                  child: Text(item),
                 ))
             .toList(),
         onChanged: onChanged,
