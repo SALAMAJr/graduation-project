@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:furniswap/icons/icons.dart';
-import 'package:furniswap/presentation/screens/repair_details_screen.dart';
+import 'package:furniswap/presentation/screens/repairDetailsScreen.dart';
 
 class RepairScreen extends StatelessWidget {
   const RepairScreen({super.key});

@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:furniswap/data/repository/createproducts/HomeRepoImpl.dart';
 import 'package:furniswap/data/repository/createproducts/homeRepo.dart';
-import 'package:furniswap/presentation/manager/cubit/home_cubit.dart';
+import 'package:furniswap/presentation/manager/homeCubit/home_cubit.dart';
 import 'package:get_it/get_it.dart';
 
 // API Services
@@ -22,11 +22,11 @@ import 'package:furniswap/data/repository/chating/chat_repo.dart';
 import 'package:furniswap/data/repository/chating/chat_repo_impl.dart';
 
 // Cubits
-import 'package:furniswap/presentation/manager/cubit/product_cubit.dart';
-import 'package:furniswap/presentation/manager/cubit/user_details_cubit.dart';
-import 'package:furniswap/presentation/manager/cubit/forgot_password_cubit.dart';
-import 'package:furniswap/presentation/manager/cubit/reset_password_cubit.dart';
-import 'package:furniswap/presentation/manager/cubit/product_search_cubit.dart';
+import 'package:furniswap/presentation/manager/productCubit/product_cubit.dart';
+import 'package:furniswap/presentation/manager/userCubit/user_details_cubit.dart';
+import 'package:furniswap/presentation/manager/authCubit/forgot_password_cubit.dart';
+import 'package:furniswap/presentation/manager/authCubit/reset_password_cubit.dart';
+import 'package:furniswap/presentation/manager/productCubit/product_search_cubit.dart';
 // HomeCubit (الجديد)
 
 final getIt = GetIt.instance;

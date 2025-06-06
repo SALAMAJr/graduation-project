@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:furniswap/presentation/manager/cubit/home_cubit.dart';
-import 'package:furniswap/presentation/manager/cubit/product_search_cubit.dart';
-import 'package:furniswap/presentation/manager/cubit/user_details_cubit.dart';
+import 'package:furniswap/presentation/manager/homeCubit/home_cubit.dart';
+import 'package:furniswap/presentation/manager/productCubit/product_search_cubit.dart';
+import 'package:furniswap/presentation/manager/userCubit/user_details_cubit.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import 'package:furniswap/core/injection/setup_dependencies.dart';
@@ -13,13 +13,13 @@ import 'package:furniswap/data/repository/createproducts/product_repo.dart';
 import 'package:furniswap/data/repository/chating/chat_repo.dart';
 
 // Cubits
-import 'package:furniswap/presentation/manager/cubit/sign_up_cubit.dart';
-import 'package:furniswap/presentation/manager/cubit/login_cubit.dart';
-import 'package:furniswap/presentation/manager/cubit/product_cubit.dart';
-import 'package:furniswap/presentation/manager/cubit/forgot_password_cubit.dart';
-import 'package:furniswap/presentation/manager/cubit/reset_password_cubit.dart';
+import 'package:furniswap/presentation/manager/authCubit/sign_up_cubit.dart';
+import 'package:furniswap/presentation/manager/authCubit/login_cubit.dart';
+import 'package:furniswap/presentation/manager/productCubit/product_cubit.dart';
+import 'package:furniswap/presentation/manager/authCubit/forgot_password_cubit.dart';
+import 'package:furniswap/presentation/manager/authCubit/reset_password_cubit.dart';
 
-import 'package:furniswap/presentation/screens/splash_screen.dart';
+import 'package:furniswap/presentation/screens/splashScreen.dart';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();

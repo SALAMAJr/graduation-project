@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:furniswap/presentation/manager/cubit/reset_password_cubit.dart';
-import 'package:furniswap/presentation/screens/login_screen.dart';
+import 'package:furniswap/presentation/manager/authCubit/reset_password_cubit.dart';
+import 'package:furniswap/presentation/screens/loginScreen.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
   final String email;

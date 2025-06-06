@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:furniswap/icons/icons.dart';
-import 'package:furniswap/presentation/screens/swap_details_screen.dart';
+import 'package:furniswap/presentation/screens/swapDetailsScreen.dart';
 
 class SwapScreen extends StatelessWidget {
   const SwapScreen({super.key});

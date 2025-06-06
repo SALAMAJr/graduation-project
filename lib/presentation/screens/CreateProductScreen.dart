@@ -2,9 +2,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:furniswap/presentation/manager/cubit/product_cubit.dart';
+import 'package:furniswap/presentation/manager/productCubit/product_cubit.dart';
 import 'package:furniswap/data/models/createproduct/product_entity.dart';
-import 'package:furniswap/presentation/screens/listings_screen.dart';
+import 'package:furniswap/presentation/screens/listingsScreen.dart';
 
 class CreateProductScreen extends StatefulWidget {
   const CreateProductScreen({super.key});
