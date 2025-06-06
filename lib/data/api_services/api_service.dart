@@ -165,7 +165,12 @@ class ApiService {
         '$_baseUrl$endPoint',
         options: Options(headers: headers),
       );
-      return response.data;
+      // تأكد دايمًا بترجع Map
+      if (response.data is Map<String, dynamic>) {
+        return response.data;
+      } else {
+        return {"message": response.data.toString()};
+      }
     } on DioException catch (e) {
       print("❌ DELETE request error: ${e.message}");
       print("📍 URL: $_baseUrl$endPoint");
