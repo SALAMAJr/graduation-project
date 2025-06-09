@@ -3,7 +3,6 @@ abstract class SocketService {
   void connect();
 
   /// الاستماع لقائمة المحادثات
-  void getChatList(Function(List<Map<String, dynamic>>) onData);
 
   /// إرسال رسالة لغرفة معينة
   void sendMessage({required String receiverId, required String content});

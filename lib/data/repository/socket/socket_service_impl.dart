@@ -30,14 +30,6 @@ class SocketServiceImpl implements SocketService {
   }
 
   @override
-  void getChatList(Function(List<Map<String, dynamic>>) onData) {
-    _socket.emit("get_chat_list");
-    _socket.on("chat_list", (data) {
-      onData(List<Map<String, dynamic>>.from(data));
-    });
-  }
-
-  @override
   void sendMessage({required String receiverId, required String content}) {
     final message = {
       "receiverId": receiverId,

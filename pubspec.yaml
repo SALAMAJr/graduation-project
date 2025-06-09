@@ -67,6 +67,7 @@ flutter:
 
   assets:
     - assets/images/
+    
 
   fonts:
     - family: pop

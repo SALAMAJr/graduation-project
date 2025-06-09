@@ -1,122 +1,98 @@
 import 'package:flutter/material.dart';
-import 'messagesDetailsScreen.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:furniswap/presentation/manager/ChatCubit/cubit/chats_list_cubit.dart';
+import 'package:furniswap/presentation/screens/messagesDetailsScreen.dart';
 
 class MessagesListScreen extends StatelessWidget {
   const MessagesListScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Color(0xffF5EFE6),
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        centerTitle: true,
-        title: Text(
-          "Messages",
-          style: TextStyle(
-            color: Color(0xff694A38),
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
+    return BlocProvider.value(
+      value: BlocProvider.of<ChatsListCubit>(context)..loadChats(),
+      child: Scaffold(
+        backgroundColor: const Color(0xffF5EFE6),
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          centerTitle: true,
+          title: const Text(
+            "Messages",
+            style: TextStyle(
+              color: Color(0xff694A38),
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
           ),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.search, color: Color(0xff694A38)),
+              onPressed: () {},
+            ),
+          ],
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.search, color: Color(0xff694A38)),
-            onPressed: () {},
-          ),
-        ],
-      ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          SizedBox(height: 12),
-          MessageTile(
-            name: 'Sarah Miller',
-            subtitle: 'Swapping: Leather Sofa',
-            message: 'Is the sofa still available for swap?',
-            time: '10:24 AM',
-            profileImage: 'assets/images/Avatar.png',
-            unread: true,
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => MessagesDetailsScreen()),
+        body: BlocBuilder<ChatsListCubit, ChatsListState>(
+          builder: (context, state) {
+            if (state is ChatsListLoading) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (state is ChatsListLoaded) {
+              final chats = state.chats;
+              if (chats.isEmpty) {
+                return const Center(child: Text('No chats found.'));
+              }
+              return ListView.builder(
+                padding: const EdgeInsets.all(16),
+                itemCount: chats.length,
+                itemBuilder: (context, index) {
+                  final chat = chats[index];
+                  final displayName = _formatName(chat.receiverId);
+                  final chatId = chat.chatId ?? '';
+                  final receiverId = chat.receiverId ?? '';
+                  return MessageTile(
+                    name: displayName,
+                    subtitle: "Chat ID: ${_shortChatId(chatId)}",
+                    message: "", // آخر رسالة لو عندك
+                    time: "", // وقت آخر رسالة لو عندك
+                    profileImage: 'assets/images/Avatar.png',
+                    unread: false,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => MessagesDetailsScreen(
+                            receiverId: receiverId,
+                            chatId: chatId,
+                            receiverName: displayName,
+                            receiverImage: 'assets/images/Avatar.png',
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                },
               );
-            },
-          ),
-          SizedBox(height: 24),
-          MessageTile(
-            name: 'James Cooper',
-            subtitle: 'Swapping: Dining Table',
-            message: "Perfect! Let's arrange the pickup time...",
-            time: 'Yesterday',
-            profileImage: 'assets/images/Avatar.png',
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => MessagesDetailsScreen()),
-              );
-            },
-          ),
-          SizedBox(height: 24),
-          MessageTile(
-            name: 'Emma Wilson',
-            subtitle: 'Swapping: Vintage Lamp',
-            message: 'Thank you for the swap! The lamp looks...',
-            time: 'Wed',
-            profileImage: 'assets/images/Avatar.png',
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => MessagesDetailsScreen()),
-              );
-            },
-          ),
-          SizedBox(height: 24),
-          MessageTile(
-            name: 'Michael Chen',
-            subtitle: 'Swapping: Leather Sofa',
-            message: 'Would you consider a partial swap...',
-            time: 'Mon',
-            profileImage: 'assets/images/Avatar.png',
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => MessagesDetailsScreen()),
-              );
-            },
-          ),
-          SizedBox(height: 24),
-          MessageTile(
-            name: 'Lisa Thompson',
-            subtitle: 'Swapping: Coffee Table',
-            message: 'I can meet this weekend for the swap...',
-            time: 'Sun',
-            profileImage: 'assets/images/Avatar.png',
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => MessagesDetailsScreen()),
-              );
-            },
-          ),
-          SizedBox(height: 24),
-          MessageTile(
-            name: 'Lisa Thompson',
-            subtitle: 'Swapping: Coffee Table',
-            message: 'I can meet this weekend for the swap...',
-            time: 'Sat',
-            profileImage: 'assets/images/Avatar.png',
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => MessagesDetailsScreen()),
-              );
-            },
-          ),
-        ],
+            } else if (state is ChatsListError) {
+              return Center(child: Text(state.message));
+            } else {
+              return const Center(child: Text('...'));
+            }
+          },
+        ),
       ),
     );
+  }
+
+  String _formatName(String name) {
+    if (name.isEmpty) return 'User';
+    final uuidParts = name.split('-');
+    if (uuidParts.length >= 3 || name.length > 18) {
+      return "User";
+    }
+    return name;
+  }
+
+  String _shortChatId(String chatId) {
+    if (chatId.length <= 14) return chatId;
+    return "${chatId.substring(0, 7)}...${chatId.substring(chatId.length - 4)}";
   }
 }
 
@@ -143,14 +119,14 @@ class MessageTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => Navigator.push(context,
-          MaterialPageRoute(builder: (context) => MessagesDetailsScreen())),
+      onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(12),
+        margin: const EdgeInsets.only(bottom: 14),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Color(0xffE8E2DC)),
+          border: Border.all(color: const Color(0xffE8E2DC)),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -165,33 +141,42 @@ class MessageTile extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        name,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
+                      Expanded(
+                        child: Text(
+                          name,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
                         ),
                       ),
+                      const SizedBox(width: 8),
                       Text(
                         time,
                         style: const TextStyle(
                           color: Colors.grey,
                           fontSize: 12,
                         ),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
                       ),
                     ],
                   ),
                   const SizedBox(height: 2),
                   Text(
                     subtitle,
-                    style: const TextStyle(color: Colors.brown),
+                    style: const TextStyle(color: Colors.brown, fontSize: 12),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
                   ),
                   const SizedBox(height: 4),
                   Text(
                     message,
                     style: const TextStyle(color: Colors.black87),
                     overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
                   ),
                   if (unread)
                     const Padding(

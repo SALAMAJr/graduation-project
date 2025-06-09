@@ -62,7 +62,12 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
           final newReview = await Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => CreateReviewScreen(),
+              builder: (context) => CreateReviewScreen(
+                productId: '',
+                imageUrl: '',
+                productName: '',
+                ownerName: '',
+              ),
             ),
           );
           if (newReview != null) {
@@ -116,7 +121,12 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                         final newReview = await Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => CreateReviewScreen(),
+                            builder: (context) => CreateReviewScreen(
+                              productId: '',
+                              imageUrl: '',
+                              productName: '',
+                              ownerName: '',
+                            ),
                           ),
                         );
                         if (newReview != null) {

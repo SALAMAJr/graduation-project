@@ -5,6 +5,8 @@ import 'package:furniswap/icons/icons.dart';
 import 'package:furniswap/presentation/screens/createReviewScreen.dart';
 import 'package:furniswap/presentation/screens/messagesListScreen.dart';
 import 'package:furniswap/presentation/screens/notificationsScreen.dart';
+// اضيف import شاشة الشات هنا
+import 'package:furniswap/presentation/screens/messagesDetailsScreen.dart';
 
 class ProductDetailsScreenHome extends StatefulWidget {
   final HomeModel product;
@@ -15,10 +17,11 @@ class ProductDetailsScreenHome extends StatefulWidget {
   });
 
   @override
-  State<ProductDetailsScreenHome> createState() => _ProductDetailsScreenState();
+  State<ProductDetailsScreenHome> createState() =>
+      _ProductDetailsScreenHomeState();
 }
 
-class _ProductDetailsScreenState extends State<ProductDetailsScreenHome> {
+class _ProductDetailsScreenHomeState extends State<ProductDetailsScreenHome> {
   late List<String> images;
   int _currentIndex = 0;
 
@@ -219,10 +222,27 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreenHome> {
             Flexible(
               flex: 1,
               child: ElevatedButton(
-                onPressed: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const CreateReviewScreen()),
-                ),
+                onPressed: () {
+                  print('==== Going to Review Screen ====');
+                  print('productId: ${product.id}');
+                  print('imageUrl: ${product.imageUrl}');
+                  print('productName: ${product.name}');
+                  print(
+                      'ownerName: ${user != null ? '${user.firstName} ${user.lastName}' : 'Unknown'}');
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => CreateReviewScreen(
+                        productId: product.id,
+                        imageUrl: product.imageUrl,
+                        productName: product.name,
+                        ownerName: user != null
+                            ? '${user.firstName} ${user.lastName}'
+                            : 'Unknown',
+                      ),
+                    ),
+                  );
+                },
                 style: ElevatedButton.styleFrom(
                   elevation: 5,
                   minimumSize: const Size(double.infinity, 48),
@@ -248,7 +268,24 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreenHome> {
             Flexible(
               flex: 1,
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  // هنا بنحول للـ MessagesDetailsScreen مع ارسال بيانات الريسيفر
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => MessagesDetailsScreen(
+                        receiverId: user?.id ?? "",
+                        chatId:
+                            null, // لو عندك chatId من الـ product ابعته هنا بدل null
+                        receiverName: user != null
+                            ? "${user.firstName} ${user.lastName}"
+                            : "Unknown",
+                        receiverImage:
+                            user?.image ?? "assets/images/default_avatar.png",
+                      ),
+                    ),
+                  );
+                },
                 style: ElevatedButton.styleFrom(
                   elevation: 5,
                   minimumSize: const Size(double.infinity, 48),
