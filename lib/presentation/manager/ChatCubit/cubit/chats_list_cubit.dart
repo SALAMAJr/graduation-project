@@ -1,6 +1,6 @@
-import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:furniswap/data/models/socketModel/ChatModel.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:furniswap/data/models/socketModel/SimpleChatModel.dart';
 import 'package:furniswap/data/repository/chating/chat_repo.dart';
 
 part 'chats_list_state.dart';
@@ -15,7 +15,8 @@ class ChatsListCubit extends Cubit<ChatsListState> {
   Future<void> loadChats() async {
     print("⏳ loadChats() called, emitting ChatsListLoading...");
     emit(ChatsListLoading());
-    final result = await chatRepo.getMyChats();
+    final result =
+        await chatRepo.getMyChats(); // دلوقتي بيرجع List<SimpleChatModel>
     print("📡 getMyChats() finished! Result: $result");
 
     result.fold(

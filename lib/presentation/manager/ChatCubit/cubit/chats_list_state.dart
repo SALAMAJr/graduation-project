@@ -16,7 +16,7 @@ class ChatsListLoading extends ChatsListState {
 }
 
 class ChatsListLoaded extends ChatsListState {
-  final List<ChatModel> chats;
+  final List<SimpleChatModel> chats;
   const ChatsListLoaded(this.chats);
 
   @override

@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:furniswap/presentation/manager/ChatCubit/cubit/chat_details_cubit.dart';
 import 'package:get_it/get_it.dart';
 
 // API Services
@@ -45,6 +46,7 @@ void setupDependencies() {
   // 3. Register كل الـ repositories اللي محتاجة ApiService
   getIt.registerLazySingleton<AuthRepo>(() => AuthRepoImpl(apiService));
   getIt.registerLazySingleton<ProductRepo>(() => ProductRepoImpl(apiService));
+  // تأكد أن UserRepo موجود ومستورد بشكل صحيح
   getIt.registerLazySingleton<UserRepo>(() => UserRepoImpl(apiService));
   getIt.registerLazySingleton<ProductSearchRepo>(
       () => ProductSearchRepoImpl(apiService));
@@ -58,7 +60,7 @@ void setupDependencies() {
   getIt.registerLazySingleton<ChatRepo>(
       () => ChatRepoImpl(getIt<ApiService>(), getIt<SocketService>()));
 
-  // 6. Register كل الـ cubits
+  // 6. Register كل الـ cubits (بنستخدم registerFactory عشان كل مرة نطلب Cubit يدينا نسخة جديدة)
   getIt.registerFactory<ProductCubit>(() => ProductCubit(getIt<ProductRepo>()));
   getIt.registerFactory<UserCubit>(() => UserCubit(getIt<UserRepo>()));
   getIt.registerFactory<ForgotPasswordCubit>(
@@ -72,4 +74,6 @@ void setupDependencies() {
       () => CreateReviewCubit(getIt<ReviewRepo>()));
   getIt
       .registerFactory<ChatsListCubit>(() => ChatsListCubit(getIt<ChatRepo>()));
+  getIt.registerFactory<ChatDetailsCubit>(
+      () => ChatDetailsCubit(getIt<ChatRepo>()));
 }

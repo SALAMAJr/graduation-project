@@ -33,18 +33,20 @@ class HomeModel {
 
   factory HomeModel.fromJson(Map<String, dynamic> json) {
     return HomeModel(
-      id: json['id'],
-      name: json['name'],
-      price: json['price'],
-      description: json['description'],
-      imageUrl: json['imageUrl'],
-      type: json['type'],
-      condition: json['condition'],
-      status: json['status'],
-      category: json['category'],
-      location: json['location'],
-      createdAt: DateTime.parse(json['createdAt']),
-      priceType: json['priceType'],
+      id: json['id'] ?? '',
+      name: json['name'] ?? '',
+      price: json['price'] ?? 0,
+      description: json['description'] ?? '',
+      imageUrl: json['imageUrl'] ?? '',
+      type: json['type'] ?? '',
+      condition: json['condition'] ?? '',
+      status: json['status'] ?? '',
+      category: json['category'] ?? '',
+      location: json['location'] ?? '',
+      createdAt: json['createdAt'] != null
+          ? DateTime.tryParse(json['createdAt']) ?? DateTime.now()
+          : DateTime.now(),
+      priceType: json['priceType'] ?? '',
       user: json['user'] != null ? UserModel.fromJson(json['user']) : null,
     );
   }

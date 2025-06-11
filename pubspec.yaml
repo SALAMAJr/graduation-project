@@ -47,6 +47,7 @@ dependencies:
   hive_flutter: ^1.1.0
   http_parser: ^4.1.2
   image_picker: ^1.1.2
+  intl: ^0.20.2
   permission_handler: ^11.0.1
   socket_io_client: ^3.1.2
 
@@ -67,7 +68,6 @@ flutter:
 
   assets:
     - assets/images/
-    
 
   fonts:
     - family: pop
