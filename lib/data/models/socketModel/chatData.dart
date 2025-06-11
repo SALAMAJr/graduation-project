@@ -76,12 +76,14 @@ class Participant {
 class ChatMessage {
   final String id;
   final String message;
+  final String? imageUrl; // أضف ده
   final DateTime createdAt;
   final String senderId;
 
   ChatMessage({
     required this.id,
     required this.message,
+    this.imageUrl, // أضف ده
     required this.createdAt,
     required this.senderId,
   });
@@ -90,6 +92,7 @@ class ChatMessage {
     return ChatMessage(
       id: json['id'] ?? '',
       message: json['message'] ?? '',
+      imageUrl: json['imageUrl'], // أضف ده (ممكن يجي null عادي)
       createdAt: DateTime.tryParse(json['createdAt'] ?? '') ?? DateTime.now(),
       senderId: json['sender']?['id'] ?? '',
     );

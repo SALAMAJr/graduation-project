@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:furniswap/data/api_services/api_service.dart';
+import 'package:furniswap/data/models/socketModel/ReceiverModel.dart';
 import 'package:furniswap/data/models/socketModel/SimpleChatModel.dart';
 import 'package:furniswap/data/models/socketModel/chatData.dart';
 import 'package:furniswap/data/repository/socket/socket_service.dart';
@@ -116,5 +117,28 @@ class ChatRepoImpl implements ChatRepo {
   void disconnect() {
     socketService.dispose();
     _messageController.close();
+  }
+
+  @override
+  Future<Either<Failure, ReceiverModel>> getReceiverInfo(
+      String receiverId) async {
+    try {
+      final token = await Hive.box('authBox').get('auth_token');
+      final response = await apiService.get(
+        endPoint: '/user/getUserDetails/$receiverId',
+        headers: {'Authorization': 'Bearer $token'},
+      );
+      if (response != null) {
+        final receiver = ReceiverModel.fromJson(response);
+        return right(receiver);
+      } else {
+        return left(ServerFailure(message: "مفيش بيانات للريسيڤر"));
+      }
+    } on DioException catch (e) {
+      String msg = e.response?.data['message'] ?? "حصل مشكلة في الشبكة";
+      return left(ServerFailure(message: msg));
+    } catch (e) {
+      return left(ServerFailure(message: "حصل خطأ غير متوقع"));
+    }
   }
 }

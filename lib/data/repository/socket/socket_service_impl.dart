@@ -8,6 +8,7 @@ class SocketServiceImpl implements SocketService {
   @override
   void connect() {
     final userId = Hive.box('authBox').get('user_id');
+    print("🔑 [SocketServiceImpl] Connecting with userId: $userId");
 
     _socket = IO.io(
       'http://63.177.194.209:3002',
@@ -20,12 +21,22 @@ class SocketServiceImpl implements SocketService {
           .build(),
     );
 
+    print("🟡 [SocketServiceImpl] Trying to connect to socket server...");
+
     _socket.onConnect((_) {
-      print("✅ Connected to socket server");
+      print("✅ [SocketServiceImpl] Connected to socket server!");
     });
 
     _socket.onDisconnect((_) {
-      print("❌ Disconnected from socket server");
+      print("❌ [SocketServiceImpl] Disconnected from socket server!");
+    });
+
+    _socket.onConnectError((err) {
+      print("⛔ [SocketServiceImpl] Connect error: $err");
+    });
+
+    _socket.onError((err) {
+      print("🔥 [SocketServiceImpl] Socket general error: $err");
     });
   }
 
@@ -35,18 +46,22 @@ class SocketServiceImpl implements SocketService {
       "receiverId": receiverId,
       "content": content,
     };
-    _socket.emit("send_message", message);
+    print("✉️ [SocketServiceImpl] Sending message: $message");
+    _socket.emit("message", message);
   }
 
   @override
   void onMessage(Function(Map<String, dynamic>) callback) {
-    _socket.on("receive_message", (data) {
+    print("🟢 [SocketServiceImpl] Registering onMessage listener...");
+    _socket.on("message", (data) {
+      print("📩 [SocketServiceImpl] New message received: $data");
       callback(Map<String, dynamic>.from(data));
     });
   }
 
   @override
   void dispose() {
+    print("🚫 [SocketServiceImpl] Disposing socket...");
     _socket.dispose();
   }
 }

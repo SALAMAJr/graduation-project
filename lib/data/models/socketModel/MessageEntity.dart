@@ -1,13 +1,14 @@
-// lib/data/models/socketModel/MessageEntity.dart
 class MessageEntity {
   final String id;
   final String message;
-  final String senderId; // ده الـ ID بتاع اللي باعت الرسالة
+  final String? imageUrl; // أضف ده
+  final String senderId;
   final DateTime createdAt;
 
   MessageEntity({
     required this.id,
     required this.message,
+    this.imageUrl,
     required this.senderId,
     required this.createdAt,
   });
@@ -16,8 +17,8 @@ class MessageEntity {
     return MessageEntity(
       id: json['id'] as String,
       message: json['message'] as String,
-      senderId: json['sender']['id']
-          as String, // <--- التعديل هنا: بناخد الـ ID من جوه 'sender'
+      imageUrl: json['imageUrl'], // أضف ده
+      senderId: json['sender']['id'] as String,
       createdAt: DateTime.parse(json['createdAt'] as String),
     );
   }

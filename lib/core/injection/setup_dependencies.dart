@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:furniswap/presentation/manager/sendmessage/cubit/chat_send_message_cubit.dart';
 import 'package:get_it/get_it.dart';
 
 // API Service
@@ -34,6 +35,7 @@ import 'package:furniswap/presentation/manager/reviewCubit/cubit/getreviews_cubi
 import 'package:furniswap/presentation/manager/reviewCubit/cubit/update_review_cubit.dart';
 import 'package:furniswap/presentation/manager/ChatCubit/cubit/chats_list_cubit.dart';
 import 'package:furniswap/presentation/manager/ChatCubit/cubit/chat_details_cubit.dart';
+import 'package:furniswap/presentation/manager/ChatCubit/cubit/receiver_cubit.dart';
 
 final getIt = GetIt.instance;
 
@@ -86,4 +88,11 @@ void setupDependencies() {
       .registerFactory<ChatsListCubit>(() => ChatsListCubit(getIt<ChatRepo>()));
   getIt.registerFactory<ChatDetailsCubit>(
       () => ChatDetailsCubit(getIt<ChatRepo>()));
+
+  // Cubit لجلب بيانات الريسيفر
+  getIt.registerFactory<ReceiverCubit>(() => ReceiverCubit(getIt<ChatRepo>()));
+
+  // 🟢 Cubit لإرسال الرسائل (Send Message)
+  getIt.registerFactory<ChatSendMessageCubit>(
+      () => ChatSendMessageCubit(getIt<SocketService>()));
 }

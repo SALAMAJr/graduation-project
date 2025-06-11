@@ -24,4 +24,24 @@ class ChatDetailsCubit extends Cubit<ChatDetailsState> {
       },
     );
   }
+
+  // ====== ده اللي بنضيفه عشان تقدر تضيف الرسالة الجديدة في UI ======
+  void addMessageLocally(ChatMessage message) {
+    // لازم يكون في ستيت لودد أصلا
+    if (state is ChatDetailsLoaded) {
+      final currentState = state as ChatDetailsLoaded;
+      final updatedMessages =
+          List<ChatMessage>.from(currentState.chatData.messages)..add(message);
+
+      final updatedChatData = ChatData(
+        id: currentState.chatData.id,
+        chatName: currentState.chatData.chatName,
+        createdAt: currentState.chatData.createdAt,
+        participants: currentState.chatData.participants,
+        messages: updatedMessages,
+      );
+
+      emit(ChatDetailsLoaded(updatedChatData));
+    }
+  }
 }

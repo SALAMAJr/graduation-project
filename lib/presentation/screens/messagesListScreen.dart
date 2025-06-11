@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:furniswap/presentation/manager/ChatCubit/cubit/chats_list_cubit.dart';
+import 'package:furniswap/presentation/manager/ChatCubit/cubit/receiver_cubit.dart';
+import 'package:furniswap/presentation/manager/ChatCubit/cubit/chat_details_cubit.dart';
 import 'package:furniswap/presentation/screens/messagesDetailsScreen.dart';
-import 'package:hive/hive.dart';
+import 'package:furniswap/data/repository/chating/chat_repo.dart';
+import 'package:get_it/get_it.dart';
 
 class MessagesListScreen extends StatelessWidget {
   const MessagesListScreen({super.key});
@@ -37,10 +40,10 @@ class MessagesListScreen extends StatelessWidget {
               return const Center(child: CircularProgressIndicator());
             } else if (state is ChatsListLoaded) {
               final chats = state.chats;
-              print('Chats loaded: ${chats.length}');
               if (chats.isEmpty) {
                 return const Center(child: Text('لا توجد محادثات حتى الآن.'));
               }
+
               return ListView.builder(
                 padding: const EdgeInsets.all(16),
                 itemCount: chats.length,
@@ -49,27 +52,58 @@ class MessagesListScreen extends StatelessWidget {
                   final chatId = chat.chatId;
                   final receiverId = chat.receiverId;
 
-                  return MessageTile(
-                    name: "Receiver: $receiverId",
-                    subtitle: "Chat ID: ${_shortChatId(chatId)}",
-                    message: "ابدأ المحادثة الآن",
-                    time: "",
-                    profileImage: 'assets/images/Avatar.png', // صورة افتراضية
-                    unread: false,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => MessagesDetailsScreen(
-                            receiverId: receiverId,
-                            chatId: chatId,
-                            receiverName:
-                                receiverId, // لسه معندناش بيانات اسم حقيقي
-                            receiverImage: 'assets/images/Avatar.png',
-                          ),
-                        ),
-                      );
-                    },
+                  return BlocProvider(
+                    create: (_) => ReceiverCubit(GetIt.I<ChatRepo>())
+                      ..loadReceiver(receiverId),
+                    child: BlocBuilder<ReceiverCubit, ReceiverState>(
+                      builder: (context, state) {
+                        String name = receiverId;
+                        String image = 'assets/images/Avatar.png';
+
+                        if (state is ReceiverLoaded) {
+                          name = '${state.receiver.firstName} ${state.receiver.lastName}'
+                                  .trim()
+                                  .isEmpty
+                              ? receiverId
+                              : '${state.receiver.firstName} ${state.receiver.lastName}';
+                          image = state.receiver.image.isNotEmpty
+                              ? state.receiver.image
+                              : 'assets/images/Avatar.png';
+                        } else if (state is ReceiverLoading) {
+                          name = "جاري التحميل...";
+                        } else if (state is ReceiverError) {
+                          name = "غير متاح";
+                        }
+
+                        return MessageTile(
+                          name: name,
+                          subtitle: "",
+                          message: "ابدأ المحادثة الآن",
+                          time: "",
+                          profileImage: image,
+                          unread: false,
+                          onTap: () {
+                            // نعمل الكوبيـت هنا ونوديه مع الشاشة
+                            final chatDetailsCubit =
+                                ChatDetailsCubit(GetIt.I());
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => BlocProvider.value(
+                                  value: chatDetailsCubit,
+                                  child: MessagesDetailsScreen(
+                                    receiverId: receiverId,
+                                    chatId: chatId,
+                                    receiverName: name,
+                                    receiverImage: image,
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    ),
                   );
                 },
               );
@@ -82,11 +116,6 @@ class MessagesListScreen extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  String _shortChatId(String chatId) {
-    if (chatId.length <= 14) return chatId;
-    return "${chatId.substring(0, 7)}...${chatId.substring(chatId.length - 4)}";
   }
 }
 
@@ -126,12 +155,24 @@ class MessageTile extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ClipOval(
-              child: Image.asset(
-                profileImage,
-                width: 48,
-                height: 48,
-                fit: BoxFit.cover,
-              ),
+              child: profileImage.startsWith('http')
+                  ? Image.network(
+                      profileImage,
+                      width: 48,
+                      height: 48,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => Image.asset(
+                          'assets/images/Avatar.png',
+                          width: 48,
+                          height: 48,
+                          fit: BoxFit.cover),
+                    )
+                  : Image.asset(
+                      profileImage,
+                      width: 48,
+                      height: 48,
+                      fit: BoxFit.cover,
+                    ),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -161,12 +202,13 @@ class MessageTile extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 2),
-                  Text(
-                    subtitle,
-                    style: const TextStyle(color: Colors.brown, fontSize: 12),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
-                  ),
+                  if (subtitle.isNotEmpty)
+                    Text(
+                      subtitle,
+                      style: const TextStyle(color: Colors.brown, fontSize: 12),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
                   const SizedBox(height: 4),
                   Text(
                     message,

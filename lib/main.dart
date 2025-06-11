@@ -2,13 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:furniswap/data/repository/socket/socket_service.dart';
 import 'package:furniswap/presentation/manager/ChatCubit/cubit/chat_details_cubit.dart';
 import 'package:furniswap/presentation/manager/ChatCubit/cubit/chats_list_cubit.dart';
+import 'package:furniswap/presentation/manager/ChatCubit/cubit/receiver_cubit.dart';
 import 'package:furniswap/presentation/manager/homeCubit/home_cubit.dart';
 import 'package:furniswap/presentation/manager/productCubit/product_search_cubit.dart';
 import 'package:furniswap/presentation/manager/reviewCubit/cubit/create_review_cubit.dart';
 import 'package:furniswap/presentation/manager/reviewCubit/cubit/getreviews_cubit.dart';
 import 'package:furniswap/presentation/manager/reviewCubit/cubit/update_review_cubit.dart';
+import 'package:furniswap/presentation/manager/sendmessage/cubit/chat_send_message_cubit.dart';
 import 'package:furniswap/presentation/manager/userCubit/user_details_cubit.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:furniswap/core/injection/setup_dependencies.dart';
@@ -35,6 +38,7 @@ Future<void> main() async {
     await Hive.openBox('authBox');
 
     setupDependencies();
+    getIt<SocketService>().connect();
 
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
@@ -84,6 +88,8 @@ class MyApp extends StatelessWidget {
             create: (_) => getIt<ChatDetailsCubit>()),
         BlocProvider(create: (_) => getIt<GetUserReviewsCubit>()),
         BlocProvider(create: (_) => getIt<UpdateReviewCubit>()),
+        BlocProvider(create: (_) => getIt<ReceiverCubit>()),
+        BlocProvider(create: (_) => getIt<ChatSendMessageCubit>()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
