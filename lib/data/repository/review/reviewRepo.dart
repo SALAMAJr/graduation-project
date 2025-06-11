@@ -9,4 +9,9 @@ abstract class ReviewRepo {
     required String productId,
   });
   Future<Either<Failure, List<ReviewModel>>> getUserReviews();
+  Future<Either<Failure, ReviewModel>> updateReview({
+    required String reviewId,
+    required int rating,
+    required String comment,
+  });
 }

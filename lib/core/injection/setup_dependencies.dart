@@ -1,8 +1,7 @@
 import 'package:dio/dio.dart';
-import 'package:furniswap/presentation/manager/ChatCubit/cubit/chat_details_cubit.dart';
 import 'package:get_it/get_it.dart';
 
-// API Services
+// API Service
 import 'package:furniswap/data/api_services/api_service.dart';
 
 // Repositories
@@ -31,7 +30,10 @@ import 'package:furniswap/presentation/manager/authCubit/reset_password_cubit.da
 import 'package:furniswap/presentation/manager/productCubit/product_search_cubit.dart';
 import 'package:furniswap/presentation/manager/homeCubit/home_cubit.dart';
 import 'package:furniswap/presentation/manager/reviewCubit/cubit/create_review_cubit.dart';
+import 'package:furniswap/presentation/manager/reviewCubit/cubit/getreviews_cubit.dart';
+import 'package:furniswap/presentation/manager/reviewCubit/cubit/update_review_cubit.dart';
 import 'package:furniswap/presentation/manager/ChatCubit/cubit/chats_list_cubit.dart';
+import 'package:furniswap/presentation/manager/ChatCubit/cubit/chat_details_cubit.dart';
 
 final getIt = GetIt.instance;
 
@@ -40,27 +42,26 @@ void setupDependencies() {
   final dio = Dio();
   final apiService = ApiService(dio);
 
-  // 2. Register ApiService (ده الأساس لأي REST repo)
+  // 2. Register ApiService (REST)
   getIt.registerLazySingleton<ApiService>(() => apiService);
 
-  // 3. Register كل الـ repositories اللي محتاجة ApiService
+  // 3. Register Repositories
   getIt.registerLazySingleton<AuthRepo>(() => AuthRepoImpl(apiService));
   getIt.registerLazySingleton<ProductRepo>(() => ProductRepoImpl(apiService));
-  // تأكد أن UserRepo موجود ومستورد بشكل صحيح
   getIt.registerLazySingleton<UserRepo>(() => UserRepoImpl(apiService));
   getIt.registerLazySingleton<ProductSearchRepo>(
       () => ProductSearchRepoImpl(apiService));
   getIt.registerLazySingleton<HomeRepo>(() => HomeRepoImpl(apiService));
   getIt.registerLazySingleton<ReviewRepo>(() => ReviewRepoImpl(apiService));
 
-  // 4. Register الـ SocketService (واحد بس دايمًا)
+  // 4. SocketService
   getIt.registerLazySingleton<SocketService>(() => SocketServiceImpl());
 
-  // 5. Register الـ ChatRepoImpl (بياخد ApiService و SocketService)
+  // 5. ChatRepo
   getIt.registerLazySingleton<ChatRepo>(
       () => ChatRepoImpl(getIt<ApiService>(), getIt<SocketService>()));
 
-  // 6. Register كل الـ cubits (بنستخدم registerFactory عشان كل مرة نطلب Cubit يدينا نسخة جديدة)
+  // 6. Cubits
   getIt.registerFactory<ProductCubit>(() => ProductCubit(getIt<ProductRepo>()));
   getIt.registerFactory<UserCubit>(() => UserCubit(getIt<UserRepo>()));
   getIt.registerFactory<ForgotPasswordCubit>(
@@ -72,6 +73,15 @@ void setupDependencies() {
   getIt.registerFactory<HomeCubit>(() => HomeCubit(getIt<HomeRepo>()));
   getIt.registerFactory<CreateReviewCubit>(
       () => CreateReviewCubit(getIt<ReviewRepo>()));
+
+  // Cubit لجلب الريفيوز
+  getIt.registerFactory<GetUserReviewsCubit>(
+      () => GetUserReviewsCubit(getIt<ReviewRepo>()));
+
+  // Cubit لتحديث الريفيو (مهم لو هتعدل من UI)
+  getIt.registerFactory<UpdateReviewCubit>(
+      () => UpdateReviewCubit(getIt<ReviewRepo>()));
+
   getIt
       .registerFactory<ChatsListCubit>(() => ChatsListCubit(getIt<ChatRepo>()));
   getIt.registerFactory<ChatDetailsCubit>(

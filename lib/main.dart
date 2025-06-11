@@ -7,6 +7,8 @@ import 'package:furniswap/presentation/manager/ChatCubit/cubit/chats_list_cubit.
 import 'package:furniswap/presentation/manager/homeCubit/home_cubit.dart';
 import 'package:furniswap/presentation/manager/productCubit/product_search_cubit.dart';
 import 'package:furniswap/presentation/manager/reviewCubit/cubit/create_review_cubit.dart';
+import 'package:furniswap/presentation/manager/reviewCubit/cubit/getreviews_cubit.dart';
+import 'package:furniswap/presentation/manager/reviewCubit/cubit/update_review_cubit.dart';
 import 'package:furniswap/presentation/manager/userCubit/user_details_cubit.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:furniswap/core/injection/setup_dependencies.dart';
@@ -80,6 +82,8 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (_) => getIt<ChatsListCubit>()),
         BlocProvider<ChatDetailsCubit>(
             create: (_) => getIt<ChatDetailsCubit>()),
+        BlocProvider(create: (_) => getIt<GetUserReviewsCubit>()),
+        BlocProvider(create: (_) => getIt<UpdateReviewCubit>()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

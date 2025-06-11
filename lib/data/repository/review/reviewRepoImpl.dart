@@ -91,15 +91,22 @@ class ReviewRepoImpl implements ReviewRepo {
 
       print("✅ User Reviews Response: $response");
 
-      // لو الـ data جاية Map زي الصورة اللي بعتها
-      final data = response['data'] as Map<String, dynamic>;
+      final responseData = response['data'];
 
-      final reviews = data.values
-          .map((reviewJson) => ReviewModel.fromJson(reviewJson))
-          .toList();
+      // هنا الشيك المهم!
+      if (responseData is Map<String, dynamic>) {
+        final reviews = responseData.values
+            .where((reviewJson) => reviewJson != null)
+            .map((reviewJson) => ReviewModel.fromJson(reviewJson))
+            .toList();
 
-      return Right(reviews);
+        return Right(reviews);
+      } else {
+        // مفيش داتا خالص أو راجعة فاضية
+        return Right(<ReviewModel>[]);
+      }
     } catch (e, stackTrace) {
+      // كود الكاتش زي ما هو عندك
       if (e is DioException) {
         final responseData = e.response?.data;
 
@@ -126,6 +133,31 @@ class ReviewRepoImpl implements ReviewRepo {
 
       print("❌ Unknown Error during getUserReviews: $e");
       print("📌 StackTrace: $stackTrace");
+      return Left(ServerFailure(message: e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, ReviewModel>> updateReview({
+    required String reviewId,
+    required int rating,
+    required String comment,
+  }) async {
+    try {
+      final token = await Hive.box('authBox').get('auth_token');
+      final response = await apiService.patch(
+        endPoint: '/review/update/$reviewId',
+        data: {
+          "rating": rating,
+          "comment": comment,
+        },
+        headers: {
+          'Authorization': 'Bearer $token',
+        },
+      );
+      final updatedReview = ReviewModel.fromJson(response['data']);
+      return Right(updatedReview);
+    } catch (e) {
       return Left(ServerFailure(message: e.toString()));
     }
   }
