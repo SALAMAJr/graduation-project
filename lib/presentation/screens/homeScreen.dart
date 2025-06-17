@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:furniswap/presentation/manager/homeCubit/home_cubit.dart';
+import 'package:furniswap/presentation/screens/SearchByImageScreen.dart';
 import 'package:furniswap/presentation/screens/messagesListScreen.dart';
 import 'package:furniswap/presentation/screens/notificationsScreen.dart';
 import 'package:furniswap/presentation/screens/productDetailsScreenHome.dart';
@@ -130,14 +131,20 @@ class _HomeScreenState extends State<HomeScreen> {
                   suffixIcon: IconButton(
                     icon: const Icon(Icons.camera_alt_outlined,
                         color: Colors.black),
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => SearchByImageScreen(),
+                        ),
+                      );
+                    },
                   ),
                   contentPadding: const EdgeInsets.symmetric(vertical: 12),
                 ),
               ),
             ),
             const SizedBox(height: 15),
-
             // 🔘 Categories
             SizedBox(
               height: 35,
@@ -149,7 +156,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 separatorBuilder: (_, __) => const SizedBox(width: 10),
               ),
             ),
-
             const SizedBox(height: 20),
             const Text(
               "Home",
@@ -158,10 +164,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   fontWeight: FontWeight.bold,
                   color: Colors.black),
             ),
-
             const SizedBox(height: 10),
-
-            // هنا المنتجات هتتعرض على شكل GridView شبه الصورة بالظبط
+            // 🪑 Products GridView
             Expanded(
               child: BlocBuilder<HomeCubit, HomeState>(
                 builder: (context, state) {
@@ -188,9 +192,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) => ProductDetailsScreenHome(
-                                  product: product,
-                                ),
+                                builder: (_) =>
+                                    ProductDetailsScreenHome(product: product),
                               ),
                             );
                           },
@@ -209,7 +212,6 @@ class _HomeScreenState extends State<HomeScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
-                                // صورة المنتج
                                 ClipRRect(
                                   borderRadius: const BorderRadius.vertical(
                                       top: Radius.circular(15)),
@@ -306,10 +308,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     );
                   } else if (state is HomeError) {
                     return Center(
-                        child: Text(
-                      state.message,
-                      style: const TextStyle(color: Colors.red),
-                    ));
+                        child: Text(state.message,
+                            style: const TextStyle(color: Colors.red)));
                   } else {
                     return const SizedBox.shrink();
                   }

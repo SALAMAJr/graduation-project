@@ -33,11 +33,24 @@ class ChatRepoImpl implements ChatRepo {
       print("🌐 API response: $response");
 
       final data = response['data'];
+      print("🟠 Raw data: $data (${data.runtimeType})");
+
       if (data == null) {
         print("⚠️ Data is null");
         return right([]);
       }
-      final chatsList = (data as Map<String, dynamic>).values.toList();
+
+      // ممكن ييجي Map أو List حسب السيرفر
+      late final List chatsList;
+      if (data is Map<String, dynamic>) {
+        chatsList = data.values.toList();
+      } else if (data is List) {
+        chatsList = data;
+      } else {
+        print('❗️ Unexpected type for chats data: ${data.runtimeType}');
+        return right([]);
+      }
+
       print("🗂️ chatsList: $chatsList");
       final chats = chatsList
           .map((e) => SimpleChatModel.fromJson(e as Map<String, dynamic>))

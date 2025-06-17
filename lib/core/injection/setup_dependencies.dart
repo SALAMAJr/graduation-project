@@ -1,9 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:furniswap/presentation/manager/sendmessage/cubit/chat_send_message_cubit.dart';
 import 'package:get_it/get_it.dart';
-
-// API Service
-import 'package:furniswap/data/api_services/api_service.dart';
 
 // Repositories
 import 'package:furniswap/data/repository/auth_repo.dart';
@@ -22,6 +18,12 @@ import 'package:furniswap/data/repository/socket/socket_service.dart';
 import 'package:furniswap/data/repository/socket/socket_service_impl.dart';
 import 'package:furniswap/data/repository/chating/chat_repo.dart';
 import 'package:furniswap/data/repository/chating/chat_repo_impl.dart';
+// 🔵 Import بتاع البحث بالصور
+import 'package:furniswap/data/repository/imageSearch/ImageSearchRepo.dart';
+import 'package:furniswap/data/repository/imageSearch/ImageSearchRepoImpl.dart';
+
+// API Service
+import 'package:furniswap/data/api_services/api_service.dart';
 
 // Cubits
 import 'package:furniswap/presentation/manager/productCubit/product_cubit.dart';
@@ -36,18 +38,21 @@ import 'package:furniswap/presentation/manager/reviewCubit/cubit/update_review_c
 import 'package:furniswap/presentation/manager/ChatCubit/cubit/chats_list_cubit.dart';
 import 'package:furniswap/presentation/manager/ChatCubit/cubit/chat_details_cubit.dart';
 import 'package:furniswap/presentation/manager/ChatCubit/cubit/receiver_cubit.dart';
+import 'package:furniswap/presentation/manager/sendmessage/cubit/chat_send_message_cubit.dart';
+// 🔵 Cubit بتاع البحث بالصور
+import 'package:furniswap/presentation/manager/imageSearch/cubit/image_search_cubit.dart';
 
 final getIt = GetIt.instance;
 
 void setupDependencies() {
-  // 1. Dio & ApiService
+  // Dio الأساسي بتاع كل حاجة بتاخد ApiService
   final dio = Dio();
   final apiService = ApiService(dio);
 
-  // 2. Register ApiService (REST)
+  // 1. Register ApiService
   getIt.registerLazySingleton<ApiService>(() => apiService);
 
-  // 3. Register Repositories
+  // 2. Register Repositories (اللي بياخدوا ApiService)
   getIt.registerLazySingleton<AuthRepo>(() => AuthRepoImpl(apiService));
   getIt.registerLazySingleton<ProductRepo>(() => ProductRepoImpl(apiService));
   getIt.registerLazySingleton<UserRepo>(() => UserRepoImpl(apiService));
@@ -56,14 +61,18 @@ void setupDependencies() {
   getIt.registerLazySingleton<HomeRepo>(() => HomeRepoImpl(apiService));
   getIt.registerLazySingleton<ReviewRepo>(() => ReviewRepoImpl(apiService));
 
-  // 4. SocketService
+  // 3. SocketService
   getIt.registerLazySingleton<SocketService>(() => SocketServiceImpl());
 
-  // 5. ChatRepo
+  // 4. ChatRepo
   getIt.registerLazySingleton<ChatRepo>(
       () => ChatRepoImpl(getIt<ApiService>(), getIt<SocketService>()));
 
-  // 6. Cubits
+  // 🔵 Register ImageSearchRepo (لازم Dio مخصوص ليه لإنه مش معتمد على ApiService)
+  getIt
+      .registerLazySingleton<ImageSearchRepo>(() => ImageSearchRepoImpl(Dio()));
+
+  // 5. Register Cubits (كلهم بياخدوا الريبو بتاعهم)
   getIt.registerFactory<ProductCubit>(() => ProductCubit(getIt<ProductRepo>()));
   getIt.registerFactory<UserCubit>(() => UserCubit(getIt<UserRepo>()));
   getIt.registerFactory<ForgotPasswordCubit>(
@@ -75,24 +84,19 @@ void setupDependencies() {
   getIt.registerFactory<HomeCubit>(() => HomeCubit(getIt<HomeRepo>()));
   getIt.registerFactory<CreateReviewCubit>(
       () => CreateReviewCubit(getIt<ReviewRepo>()));
-
-  // Cubit لجلب الريفيوز
   getIt.registerFactory<GetUserReviewsCubit>(
       () => GetUserReviewsCubit(getIt<ReviewRepo>()));
-
-  // Cubit لتحديث الريفيو (مهم لو هتعدل من UI)
   getIt.registerFactory<UpdateReviewCubit>(
       () => UpdateReviewCubit(getIt<ReviewRepo>()));
-
   getIt
       .registerFactory<ChatsListCubit>(() => ChatsListCubit(getIt<ChatRepo>()));
   getIt.registerFactory<ChatDetailsCubit>(
       () => ChatDetailsCubit(getIt<ChatRepo>()));
-
-  // Cubit لجلب بيانات الريسيفر
   getIt.registerFactory<ReceiverCubit>(() => ReceiverCubit(getIt<ChatRepo>()));
-
-  // 🟢 Cubit لإرسال الرسائل (Send Message)
   getIt.registerFactory<ChatSendMessageCubit>(
       () => ChatSendMessageCubit(getIt<SocketService>()));
+
+  // 🔵 Register ImageSearchCubit بعد ما الريبو بتاعه يتسجل فوق
+  getIt.registerFactory<ImageSearchCubit>(
+      () => ImageSearchCubit(getIt<ImageSearchRepo>()));
 }

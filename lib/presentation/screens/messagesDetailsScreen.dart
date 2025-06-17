@@ -9,6 +9,8 @@ import 'package:hive/hive.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:get_it/get_it.dart';
 import 'package:furniswap/data/repository/socket/socket_service.dart';
+// 👇 أهم سطر هنا
+import 'package:furniswap/core/globals.dart';
 
 class MessagesDetailsScreen extends StatefulWidget {
   final String receiverId;
@@ -39,6 +41,8 @@ class _MessagesDetailsScreenState extends State<MessagesDetailsScreen> {
   @override
   void initState() {
     super.initState();
+    // 👇 هنا نقول إحنا في شات ده
+    currentlyOpenedChatId = widget.chatId;
     myId = Hive.box('authBox').get('user_id', defaultValue: "");
     print("🔑 My ID: $myId | ReceiverID: ${widget.receiverId}");
 
@@ -96,6 +100,8 @@ class _MessagesDetailsScreenState extends State<MessagesDetailsScreen> {
 
   @override
   void dispose() {
+    // 👇 لما تخرج من الشات، خلي المتغير فاضي
+    currentlyOpenedChatId = null;
     _controller.dispose();
     _focusNode.dispose();
     _scrollController.dispose();
