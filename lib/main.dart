@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:furniswap/core/globals.dart';
+import 'package:furniswap/presentation/manager/category/cubit/category_products_cubit.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 
@@ -82,6 +83,9 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (_) => getIt<ResetPasswordCubit>()),
         BlocProvider(create: (_) => getIt<UserCubit>()),
         BlocProvider(create: (_) => getIt<ProductSearchCubit>()),
+        BlocProvider(
+            create: (_) => getIt<CategoryProductsCubit>()), // 👈 ده الجديد
+
         BlocProvider(create: (_) => getIt<HomeCubit>()),
         BlocProvider(create: (_) => getIt<CreateReviewCubit>()),
         BlocProvider(create: (_) => getIt<ChatsListCubit>()),

@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:furniswap/presentation/screens/messagesListScreen.dart';
 import 'package:furniswap/presentation/screens/notificationsScreen.dart';
+import 'package:furniswap/presentation/screens/searchResultsScreen.dart';
+import 'package:furniswap/presentation/manager/category/cubit/category_products_cubit.dart';
+import 'package:furniswap/core/injection/setup_dependencies.dart';
 
 class CategoriesScreen extends StatefulWidget {
   const CategoriesScreen({super.key});
@@ -60,8 +64,8 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
         });
       },
       style: ElevatedButton.styleFrom(
-        padding: EdgeInsets.symmetric(horizontal: 15),
-        backgroundColor: isSelected ? Color(0xff694A38) : Colors.white,
+        padding: const EdgeInsets.symmetric(horizontal: 15),
+        backgroundColor: isSelected ? const Color(0xff694A38) : Colors.white,
         overlayColor: Colors.white.withOpacity(0.4),
         shadowColor: Colors.white12,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
@@ -82,18 +86,34 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 4,
-            offset: Offset(0, 2),
-          ),
+          const BoxShadow(
+              color: Colors.black12, blurRadius: 4, offset: Offset(0, 2))
         ],
       ),
       child: Material(
         color: Colors.transparent,
         borderRadius: BorderRadius.circular(12),
         child: InkWell(
-          onTap: () {},
+          onTap: () {
+            final category = item["title"];
+            if (category == null || category.isEmpty) return;
+
+            final newCubit = CategoryProductsCubit(getIt())
+              ..fetchByCategory(category);
+
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => BlocProvider.value(
+                  value: newCubit,
+                  child: SearchResultsScreen(
+                    query: category,
+                    isCategory: true,
+                  ),
+                ),
+              ),
+            );
+          },
           borderRadius: BorderRadius.circular(12),
           splashColor: Colors.brown.withOpacity(0.1),
           highlightColor: Colors.brown.withOpacity(0.2),
@@ -106,30 +126,27 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                   borderRadius: BorderRadius.circular(12),
                   child: AspectRatio(
                     aspectRatio: 1,
-                    child: Image.asset(
-                      item["image"]!,
-                      fit: BoxFit.cover,
-                    ),
+                    child: Image.asset(item["image"]!, fit: BoxFit.cover),
                   ),
                 ),
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8),
                   child: Text(
                     item["title"]!,
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Color(0xff2C1810),
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
-                SizedBox(height: 4),
+                const SizedBox(height: 4),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8),
                   child: Text(
                     item["subtitle"]!,
-                    style: TextStyle(
+                    style: const TextStyle(
                         fontSize: 12, color: Color.fromARGB(100, 44, 24, 16)),
                   ),
                 ),
@@ -144,46 +161,26 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xffF5EFE6),
+      backgroundColor: const Color(0xffF5EFE6),
       appBar: AppBar(
         backgroundColor: Colors.white,
         centerTitle: true,
-        title: Text(
-          "Categories",
-          style: TextStyle(
-              color: Color(0xff694A38),
-              fontSize: 20,
-              fontWeight: FontWeight.bold),
-        ),
+        title: const Text("Categories",
+            style: TextStyle(
+                color: Color(0xff694A38),
+                fontSize: 20,
+                fontWeight: FontWeight.bold)),
         actions: [
           IconButton(
             icon:
                 const Icon(Icons.notifications_none, color: Color(0xff694A38)),
-            onPressed: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => NotificationsScreen()));
-            },
-            style: TextButton.styleFrom(
-              padding: EdgeInsets.symmetric(horizontal: 3),
-              minimumSize: Size.zero,
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            ),
+            onPressed: () => Navigator.push(context,
+                MaterialPageRoute(builder: (_) => NotificationsScreen())),
           ),
           IconButton(
             icon: const Icon(Icons.sms_outlined, color: Color(0xff694A38)),
-            onPressed: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => MessagesListScreen()));
-            },
-            style: TextButton.styleFrom(
-              padding: EdgeInsets.only(left: 3, right: 8),
-              minimumSize: Size.zero,
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            ),
+            onPressed: () => Navigator.push(context,
+                MaterialPageRoute(builder: (_) => MessagesListScreen())),
           ),
         ],
       ),
@@ -191,34 +188,6 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
         padding: const EdgeInsets.only(top: 10, right: 15, left: 15),
         child: Column(
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                FloatingActionButton(
-                  onPressed: () {},
-                  elevation: 0,
-                  backgroundColor: Colors.white,
-                  mini: true,
-                  shape: CircleBorder(),
-                  child: Icon(
-                    Icons.notifications_none,
-                    color: Colors.black,
-                  ),
-                ),
-                FloatingActionButton(
-                  onPressed: () {},
-                  elevation: 0,
-                  backgroundColor: Colors.white,
-                  mini: true,
-                  shape: CircleBorder(),
-                  child: Icon(
-                    Icons.favorite_outline,
-                    color: Colors.black,
-                  ),
-                ),
-              ],
-            ),
-            // السيرش بار اتمسح خلاص من هنا
             Padding(
               padding: const EdgeInsets.only(top: 6, bottom: 10),
               child: SizedBox(
@@ -226,28 +195,24 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                 child: ListView.separated(
                   scrollDirection: Axis.horizontal,
                   itemCount: categories.length,
-                  itemBuilder: (context, index) {
-                    return buildCategoryItem(categories[index]);
-                  },
-                  separatorBuilder: (BuildContext context, int index) {
-                    return SizedBox(width: 10);
-                  },
+                  itemBuilder: (context, index) =>
+                      buildCategoryItem(categories[index]),
+                  separatorBuilder: (_, __) => const SizedBox(width: 10),
                 ),
               ),
             ),
             Expanded(
               child: GridView.builder(
-                padding: EdgeInsets.symmetric(vertical: 12),
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
                   crossAxisSpacing: 15,
                   mainAxisSpacing: 15,
                   childAspectRatio: 0.75,
                 ),
                 itemCount: items.length,
-                itemBuilder: (context, index) {
-                  return buildCategoryCard(items[index]);
-                },
+                itemBuilder: (context, index) =>
+                    buildCategoryCard(items[index]),
               ),
             )
           ],

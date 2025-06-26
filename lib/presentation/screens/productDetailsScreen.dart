@@ -1,14 +1,13 @@
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:furniswap/data/models/createproduct/product_search_model.dart';
+import 'package:furniswap/data/models/createproduct/product_item.dart';
 import 'package:furniswap/icons/icons.dart';
 import 'package:furniswap/presentation/screens/createReviewScreen.dart';
 import 'package:furniswap/presentation/screens/messagesListScreen.dart';
 import 'package:furniswap/presentation/screens/notificationsScreen.dart';
-import 'package:furniswap/presentation/screens/messagesDetailsScreen.dart'; // هنا الإضافة المهمة
+import 'package:furniswap/presentation/screens/messagesDetailsScreen.dart';
 
 class ProductDetailsScreen extends StatefulWidget {
-  final ProductSearchModel product;
+  final ProductItem product;
 
   const ProductDetailsScreen({
     super.key,
@@ -35,23 +34,16 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
       height: 250,
       child: Stack(
         children: [
-          CarouselSlider(
-            options: CarouselOptions(
-              height: 250,
-              viewportFraction: 1.0,
-              enableInfiniteScroll: true,
-              onPageChanged: (index, reason) {
-                setState(() {
-                  _currentIndex = index;
-                });
-              },
-            ),
-            items: images.map((image) {
-              return Container(
-                width: double.infinity,
-                child: Image.network(image, fit: BoxFit.cover),
-              );
-            }).toList(),
+          PageView.builder(
+            itemCount: images.length,
+            onPageChanged: (index) {
+              setState(() {
+                _currentIndex = index;
+              });
+            },
+            itemBuilder: (context, index) {
+              return Image.network(images[index], fit: BoxFit.cover);
+            },
           ),
           Positioned(
             bottom: 16,
@@ -80,7 +72,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     final product = widget.product;
-    final user = product.user;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F1ED),
@@ -132,41 +123,9 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   const SizedBox(height: 12),
                   Row(
                     children: [
-                      CircleAvatar(
-                        radius: 20,
-                        backgroundImage:
-                            user?.image != null && user!.image.isNotEmpty
-                                ? NetworkImage(user.image)
-                                : const AssetImage(
-                                        'assets/images/default_avatar.png')
-                                    as ImageProvider,
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        user != null
-                            ? '${user.firstName} ${user.lastName}'
-                            : 'Unknown User',
-                        style: const TextStyle(
-                            fontSize: 17, color: Color(0xff4B5563)),
-                      ),
-                      if (user != null) ...[
-                        const SizedBox(width: 6),
-                        const Icon(Icons.verified,
-                            color: Colors.green, size: 18),
-                      ],
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
                       const Icon(Icons.category, size: 18),
                       const SizedBox(width: 4),
-                      Text(product.category),
-                      const SizedBox(width: 12),
-                      const Icon(Icons.location_on,
-                          color: Colors.grey, size: 18),
-                      const SizedBox(width: 2),
-                      Text(product.location ?? "Unknown"),
+                      Text(product.category ?? 'Unknown'),
                     ],
                   ),
                   const SizedBox(height: 16),
@@ -221,12 +180,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
               flex: 1,
               child: ElevatedButton(
                 onPressed: () {
-                  print('==== Going to Review Screen ====');
-                  print('productId: ${product.id}');
-                  print('imageUrl: ${product.imageUrl}');
-                  print('productName: ${product.name}');
-                  print(
-                      'ownerName: ${user != null ? '${user.firstName} ${user.lastName}' : 'Unknown'}');
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -234,9 +187,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                         productId: product.id,
                         imageUrl: product.imageUrl,
                         productName: product.name,
-                        ownerName: user != null
-                            ? '${user.firstName} ${user.lastName}'
-                            : 'Unknown',
+                        ownerName: 'Seller Name',
                       ),
                     ),
                   );
@@ -267,23 +218,14 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
               flex: 1,
               child: ElevatedButton(
                 onPressed: () {
-                  final receiverId = product.user?.id ?? "";
-                  final receiverName =
-                      "${product.user?.firstName ?? ''} ${product.user?.lastName ?? ''}";
-                  final receiverImage =
-                      product.user?.image ?? "assets/images/default_avatar.png";
-
-                  print(
-                      '==== فتحنا شاشة الرسائل مع: $receiverId - $receiverName ====');
-
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (_) => MessagesDetailsScreen(
-                        receiverId: receiverId,
-                        chatId: null, // null عشان يبدأ يعمل createChat
-                        receiverName: receiverName,
-                        receiverImage: receiverImage,
+                        receiverId: product.userId,
+                        chatId: null,
+                        receiverName: 'Seller Name',
+                        receiverImage: product.imageUrl,
                       ),
                     ),
                   );

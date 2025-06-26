@@ -8,6 +8,7 @@ class ProductItem {
   final String type;
   final String status;
   final String userId;
+  final String? category;
 
   ProductItem({
     required this.id,
@@ -19,6 +20,7 @@ class ProductItem {
     required this.type,
     required this.status,
     required this.userId,
+    this.category,
   });
 
   factory ProductItem.fromJson(Map<String, dynamic> json) {
@@ -32,6 +34,22 @@ class ProductItem {
       type: json['type'] ?? '',
       status: json['status'] ?? '',
       userId: json['user']?['id'] ?? '',
+      category: json['category']?.toString(), // ✅ آمنة 100%
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'price': price,
+      'description': description,
+      'imageUrl': imageUrl,
+      'condition': condition,
+      'type': type,
+      'status': status,
+      'user': {'id': userId},
+      'category': category,
+    };
   }
 }

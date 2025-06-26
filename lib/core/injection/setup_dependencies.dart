@@ -18,6 +18,7 @@ import 'package:furniswap/data/repository/socket/socket_service.dart';
 import 'package:furniswap/data/repository/socket/socket_service_impl.dart';
 import 'package:furniswap/data/repository/chating/chat_repo.dart';
 import 'package:furniswap/data/repository/chating/chat_repo_impl.dart';
+
 // 🔵 Import بتاع البحث بالصور
 import 'package:furniswap/data/repository/imageSearch/ImageSearchRepo.dart';
 import 'package:furniswap/data/repository/imageSearch/ImageSearchRepoImpl.dart';
@@ -41,6 +42,8 @@ import 'package:furniswap/presentation/manager/ChatCubit/cubit/receiver_cubit.da
 import 'package:furniswap/presentation/manager/sendmessage/cubit/chat_send_message_cubit.dart';
 // 🔵 Cubit بتاع البحث بالصور
 import 'package:furniswap/presentation/manager/imageSearch/cubit/image_search_cubit.dart';
+// ✅ Cubit بتاع التصنيفات
+import 'package:furniswap/presentation/manager/category/cubit/category_products_cubit.dart';
 
 final getIt = GetIt.instance;
 
@@ -60,6 +63,10 @@ void setupDependencies() {
       () => ProductSearchRepoImpl(apiService));
   getIt.registerLazySingleton<HomeRepo>(() => HomeRepoImpl(apiService));
   getIt.registerLazySingleton<ReviewRepo>(() => ReviewRepoImpl(apiService));
+
+  // ✅ Register CategoryProductsCubit بعد ما سجلنا ProductRepo فوقه
+  getIt.registerFactory<CategoryProductsCubit>(
+      () => CategoryProductsCubit(getIt<ProductRepo>()));
 
   // 3. SocketService
   getIt.registerLazySingleton<SocketService>(() => SocketServiceImpl());
