@@ -4,6 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:furniswap/core/globals.dart';
 import 'package:furniswap/presentation/manager/category/cubit/category_products_cubit.dart';
+import 'package:furniswap/presentation/manager/chatBot/cubit/chat_bot_cubit.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 
@@ -96,6 +97,9 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (_) => getIt<ReceiverCubit>()),
         BlocProvider(create: (_) => getIt<ChatSendMessageCubit>()),
         BlocProvider(create: (_) => getIt<ImageSearchCubit>()),
+        BlocProvider<ChatBotCubit>(
+          create: (_) => getIt<ChatBotCubit>(),
+        ),
       ],
       child: MaterialApp(
         navigatorKey: navigatorKey,

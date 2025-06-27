@@ -6,6 +6,7 @@ import 'package:furniswap/presentation/screens/messagesListScreen.dart';
 import 'package:furniswap/presentation/screens/notificationsScreen.dart';
 import 'package:furniswap/presentation/screens/productDetailsScreenHome.dart';
 import 'package:furniswap/presentation/screens/searchResultsScreen.dart';
+import 'package:furniswap/presentation/screens/chatBotScreen.dart'; // استورد شاشة الشات بوت
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -318,6 +319,16 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ],
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: const Color(0xff694A38),
+        child: const Icon(Icons.chat_bubble_outline, color: Colors.white),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => ChatBotScreen()),
+          );
+        },
       ),
     );
   }
