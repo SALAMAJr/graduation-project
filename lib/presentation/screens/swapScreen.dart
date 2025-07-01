@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:furniswap/icons/icons.dart';
 import 'package:furniswap/presentation/screens/messagesListScreen.dart';
 import 'package:furniswap/presentation/screens/notificationsScreen.dart';
-import 'package:furniswap/presentation/screens/diyScreen.dart';
-import 'package:furniswap/presentation/screens/repair_screen.dart';
 import 'package:furniswap/presentation/screens/swap_screen.dart';
 
 class SwapAndRepairMainScreen extends StatelessWidget {
@@ -27,18 +25,19 @@ class SwapAndRepairMainScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 3,
+      length: 1,
       child: Scaffold(
         backgroundColor: Color(0xffF5EFE6),
         appBar: AppBar(
           backgroundColor: Colors.white,
           centerTitle: true,
           title: Text(
-            "Swap & Repair",
+            "Swap",
             style: TextStyle(
-                color: Color(0xff694A38),
-                fontSize: 20,
-                fontWeight: FontWeight.bold),
+              color: Color(0xff694A38),
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           actions: [
             IconButton(
@@ -46,9 +45,10 @@ class SwapAndRepairMainScreen extends StatelessWidget {
                   color: Color(0xff694A38)),
               onPressed: () {
                 Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => NotificationsScreen()));
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => NotificationsScreen()),
+                );
               },
               style: TextButton.styleFrom(
                 padding: EdgeInsets.symmetric(horizontal: 3),
@@ -60,9 +60,9 @@ class SwapAndRepairMainScreen extends StatelessWidget {
               icon: const Icon(Icons.sms_outlined, color: Color(0xff694A38)),
               onPressed: () {
                 Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => MessagesListScreen()));
+                  context,
+                  MaterialPageRoute(builder: (context) => MessagesListScreen()),
+                );
               },
               style: TextButton.styleFrom(
                 padding: EdgeInsets.only(left: 3, right: 8),
@@ -72,32 +72,26 @@ class SwapAndRepairMainScreen extends StatelessWidget {
             ),
           ],
           bottom: TabBar(
-              overlayColor:
-                  WidgetStateProperty.all(Colors.brown.withOpacity(0.07)),
-              labelStyle: TextStyle(
-                  fontWeight: FontWeight.bold, fontFamily: "pop", fontSize: 15),
-              unselectedLabelStyle: TextStyle(
-                  fontWeight: FontWeight.normal,
-                  fontFamily: "pop",
-                  fontSize: 15),
-              indicatorColor: Color(0xff694A38),
-              labelColor: Color(0xff694A38),
-              unselectedLabelColor: Colors.grey,
-              tabs: [
-                Tab(
-                  child: buildTabItem(icon: MyFlutterApp.swap, lable: "Swap"),
-                ),
-                Tab(
-                  child:
-                      buildTabItem(icon: MyFlutterApp.repair, lable: "Repair"),
-                ),
-                Tab(
-                  child: buildTabItem(icon: MyFlutterApp.book, lable: "DIY"),
-                ),
-              ]),
+            overlayColor:
+                WidgetStateProperty.all(Colors.brown.withOpacity(0.07)),
+            labelStyle: TextStyle(
+                fontWeight: FontWeight.bold, fontFamily: "pop", fontSize: 15),
+            unselectedLabelStyle: TextStyle(
+                fontWeight: FontWeight.normal, fontFamily: "pop", fontSize: 15),
+            indicatorColor: Color(0xff694A38),
+            labelColor: Color(0xff694A38),
+            unselectedLabelColor: Colors.grey,
+            tabs: [
+              Tab(
+                child: buildTabItem(icon: MyFlutterApp.swap, lable: "Swap"),
+              ),
+            ],
+          ),
         ),
         body: TabBarView(
-          children: [SwapScreen(), RepairScreen(), DiyScreen()],
+          children: [
+            SwapScreen(),
+          ],
         ),
       ),
     );

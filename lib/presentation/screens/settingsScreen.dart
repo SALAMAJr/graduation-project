@@ -107,53 +107,12 @@ class SettingsScreen extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            Container(
-              padding: EdgeInsets.all(20),
-              child: Row(
-                children: [
-                  Container(
-                    width: 80,
-                    height: 80,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(50),
-                      border: Border.all(color: Color(0xff694A38), width: 2),
-                    ),
-                    child: CircleAvatar(
-                      backgroundColor: Colors.white,
-                      radius: 45,
-                      backgroundImage: AssetImage("assets/images/Avatar2.png"),
-                    ),
-                  ),
-                  SizedBox(width: 15),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Mohamed Salem",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xff4A3427),
-                        ),
-                      ),
-                      SizedBox(height: 5),
-                      Text(
-                        "Mosh2eb@bk.ru",
-                        style:
-                            TextStyle(fontSize: 13, color: Color(0xff8B7355)),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
             _buildRoundedContainer([
               buildListItem(
                 icon: Icons.person_outline,
                 label: "Account Settings",
                 screen: AccountSettingsScreen(),
                 context: context,
-                isCustomIcon: false,
               ),
               buildDivider(),
               buildListItem(
@@ -161,7 +120,6 @@ class SettingsScreen extends StatelessWidget {
                 label: "Password & Security",
                 screen: PasswordSecurityScreen(),
                 context: context,
-                isCustomIcon: false,
               ),
               buildDivider(),
               buildListItem(
@@ -169,7 +127,6 @@ class SettingsScreen extends StatelessWidget {
                 label: "Notifications",
                 screen: NotificationsScreen(),
                 context: context,
-                isCustomIcon: false,
               ),
             ]),
             SizedBox(height: 10),
@@ -208,34 +165,33 @@ class SettingsScreen extends StatelessWidget {
                 isCustomIcon: true,
               ),
             ]),
-            SizedBox(
-              height: 20,
-            ),
+            SizedBox(height: 20),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(builder: (context) => LoginScreen()),
-                      (route) => false,
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                      elevation: 5,
-                      minimumSize: Size(double.infinity, 48),
-                      backgroundColor: Color(0xffEF4444),
-                      shadowColor: Colors.black26,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8))),
-                  child: const Text(
-                    "Logout",
-                    style: TextStyle(color: Colors.white),
-                  )),
+                onPressed: () {
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (context) => LoginScreen()),
+                    (route) => false,
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  elevation: 5,
+                  minimumSize: Size(double.infinity, 48),
+                  backgroundColor: Color(0xffEF4444),
+                  shadowColor: Colors.black26,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: const Text(
+                  "Logout",
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
             ),
-            SizedBox(
-              height: 15,
-            )
+            SizedBox(height: 15),
           ],
         ),
       ),

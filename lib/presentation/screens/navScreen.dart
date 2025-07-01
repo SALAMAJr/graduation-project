@@ -3,8 +3,8 @@ import 'package:furniswap/presentation/screens/categoriesScreen.dart';
 import 'package:furniswap/presentation/screens/homeScreen.dart';
 import 'package:furniswap/icons/icons.dart';
 import 'package:furniswap/presentation/screens/profileScreen.dart';
-import 'package:furniswap/presentation/screens/renovatedScreen.dart';
-import 'package:furniswap/presentation/screens/swapAndRepairMainScreen.dart';
+import 'package:furniswap/presentation/screens/myWorkShop.dart';
+import 'package:furniswap/presentation/screens/swapScreen.dart';
 
 class NavScreen extends StatefulWidget {
   final int initialIndex;
@@ -29,15 +29,15 @@ class _NavScreenState extends State<NavScreen> {
     HomeScreen(),
     CategoriesScreen(),
     SwapAndRepairMainScreen(),
-    RenovatedScreen(),
-    ProfileScreen()
+    MyWorkshopScreen(),
+    ProfileScreen(),
   ];
 
   final List<IconData> _icons = [
     MyFlutterApp.home,
     MyFlutterApp.shopping_cart,
     MyFlutterApp.swap,
-    MyFlutterApp.brush,
+    Icons.handyman,
     Icons.person,
   ];
 
@@ -45,7 +45,7 @@ class _NavScreenState extends State<NavScreen> {
     'Home',
     'Categories',
     'Swap',
-    'Renovated',
+    'Workshops', // ← تم تغييره من Renovated
     'Profile',
   ];
 
