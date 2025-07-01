@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:furniswap/presentation/screens/loginScreen.dart';
+import 'package:furniswap/presentation/screens/navScreen.dart';
+import 'package:hive/hive.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -30,8 +32,23 @@ class _SplashScreenState extends State<SplashScreen>
       curve: Curves.easeInOut,
     ));
 
-    // ❌ حذفنا التنقل التلقائي بعد 2 ثانية
-    // Future.delayed(const Duration(seconds: 2), _navigateToLogin);
+    // ✅ تشيك على التوكن للتنقل التلقائي
+    _checkLoginStatus();
+  }
+
+  Future<void> _checkLoginStatus() async {
+    final box = await Hive.openBox('authBox');
+    final token = box.get('auth_token');
+
+    if (token != null && token.isNotEmpty) {
+      // ✅ مستخدم مسجل قبل كده، نوديه على NavScreen
+      Future.delayed(const Duration(seconds: 2), () {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (_) => const NavScreen(initialIndex: 0)),
+        );
+      });
+    }
+    // ❌ لو مفيش توكن خليه واقف على SplashScreen
   }
 
   void _navigateToLogin() {
