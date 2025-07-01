@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:dotted_border/dotted_border.dart';
 import 'package:furniswap/data/models/createproduct/product_item.dart';
 import 'package:furniswap/data/models/createproduct/product_entity.dart';
 import 'package:furniswap/presentation/manager/productCubit/product_cubit.dart';
