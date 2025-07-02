@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:furniswap/icons/icons.dart';
+import 'package:furniswap/data/models/adress/address_model.dart';
 import 'package:furniswap/presentation/screens/addressesScreen.dart';
 import 'package:furniswap/presentation/screens/listingsScreen.dart';
 import 'package:furniswap/presentation/screens/messagesListScreen.dart';
@@ -9,6 +10,7 @@ import 'package:furniswap/presentation/screens/paymentMethodsScreen.dart';
 import 'package:furniswap/presentation/screens/pointsScreen.dart';
 import 'package:furniswap/presentation/screens/reviewsScreen.dart';
 import 'package:furniswap/presentation/screens/settingsScreen.dart';
+import 'package:furniswap/presentation/screens/myAddressScreen.dart'; // ✅ تأكد إنك مستوردها
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -132,6 +134,16 @@ class ProfileScreen extends StatelessWidget {
               context: context,
               isCustomIcon: true,
             ),
+            // ✅ My Address Preview
+            buildListItem(
+              icon: Icons.location_city,
+              lable: "My Addresses",
+              screen:
+                  MyAddressesScreen(), // شاشة هتعرض كل العناوين (مش عنوان واحد)
+              context: context,
+              isCustomIcon: false,
+            ),
+
             buildListItem(
               icon: MyFlutterApp.credit_card_alt,
               lable: "Payment Methods",

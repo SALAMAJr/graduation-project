@@ -1,7 +1,11 @@
 import 'package:dio/dio.dart';
-import 'package:furniswap/data/repository/ChatBot/ChatBotRepo.dart';
-import 'package:furniswap/data/repository/ChatBot/ChatBotRepoImpl.dart';
+import 'package:furniswap/data/repository/Adress/address_repo.dart';
+import 'package:furniswap/data/repository/Adress/address_repo_impl.dart';
+import 'package:furniswap/presentation/manager/adressCubit/cubit/address_cubit.dart';
 import 'package:get_it/get_it.dart';
+
+// API Service
+import 'package:furniswap/data/api_services/api_service.dart';
 
 // Repositories
 import 'package:furniswap/data/repository/auth_repo.dart';
@@ -22,11 +26,8 @@ import 'package:furniswap/data/repository/chating/chat_repo.dart';
 import 'package:furniswap/data/repository/chating/chat_repo_impl.dart';
 import 'package:furniswap/data/repository/imageSearch/ImageSearchRepo.dart';
 import 'package:furniswap/data/repository/imageSearch/ImageSearchRepoImpl.dart';
-
-// API Service
-import 'package:furniswap/data/api_services/api_service.dart';
-
-// Cubits
+import 'package:furniswap/data/repository/ChatBot/ChatBotRepo.dart';
+import 'package:furniswap/data/repository/ChatBot/ChatBotRepoImpl.dart';
 import 'package:furniswap/presentation/manager/productCubit/product_cubit.dart';
 import 'package:furniswap/presentation/manager/userCubit/user_details_cubit.dart';
 import 'package:furniswap/presentation/manager/authCubit/forgot_password_cubit.dart';
@@ -61,25 +62,17 @@ void setupDependencies() {
       () => ProductSearchRepoImpl(apiService));
   getIt.registerLazySingleton<HomeRepo>(() => HomeRepoImpl(apiService));
   getIt.registerLazySingleton<ReviewRepo>(() => ReviewRepoImpl(apiService));
+  getIt.registerLazySingleton<ChatRepo>(
+      () => ChatRepoImpl(getIt<ApiService>(), getIt<SocketService>()));
+  getIt
+      .registerLazySingleton<ImageSearchRepo>(() => ImageSearchRepoImpl(Dio()));
+  getIt.registerLazySingleton<ChatBotRepo>(() => ChatBotRepoImpl(Dio()));
 
-  // ✅ Category Cubit
-  getIt.registerFactory<CategoryProductsCubit>(
-      () => CategoryProductsCubit(getIt<ProductRepo>()));
+  // 🟠 Address Repository
+  getIt.registerLazySingleton<AddressRepo>(() => AddressRepoImpl(apiService));
 
   // 🔌 Socket
   getIt.registerLazySingleton<SocketService>(() => SocketServiceImpl());
-
-  // 💬 Chat between users
-  getIt.registerLazySingleton<ChatRepo>(
-      () => ChatRepoImpl(getIt<ApiService>(), getIt<SocketService>()));
-
-  // 🔍 Image Search
-  getIt
-      .registerLazySingleton<ImageSearchRepo>(() => ImageSearchRepoImpl(Dio()));
-
-  // 🧠 Chat Bot
-  getIt.registerLazySingleton<ChatBotRepo>(() => ChatBotRepoImpl(Dio()));
-  getIt.registerFactory<ChatBotCubit>(() => ChatBotCubit(getIt<ChatBotRepo>()));
 
   // 🟡 Cubits
   getIt.registerFactory<ProductCubit>(() => ProductCubit(getIt<ProductRepo>()));
@@ -106,4 +99,10 @@ void setupDependencies() {
       () => ChatSendMessageCubit(getIt<SocketService>()));
   getIt.registerFactory<ImageSearchCubit>(
       () => ImageSearchCubit(getIt<ImageSearchRepo>()));
+  getIt.registerFactory<CategoryProductsCubit>(
+      () => CategoryProductsCubit(getIt<ProductRepo>()));
+  getIt.registerFactory<ChatBotCubit>(() => ChatBotCubit(getIt<ChatBotRepo>()));
+
+  // ✅ Address Cubit
+  getIt.registerFactory<AddressCubit>(() => AddressCubit(getIt<AddressRepo>()));
 }

@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:furniswap/core/globals.dart';
+import 'package:furniswap/presentation/manager/adressCubit/cubit/address_cubit.dart';
 import 'package:furniswap/presentation/manager/category/cubit/category_products_cubit.dart';
 import 'package:furniswap/presentation/manager/chatBot/cubit/chat_bot_cubit.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -93,6 +94,8 @@ class MyApp extends StatelessWidget {
         BlocProvider<ChatDetailsCubit>(
             create: (_) => getIt<ChatDetailsCubit>()),
         BlocProvider(create: (_) => getIt<GetUserReviewsCubit>()),
+        BlocProvider(create: (_) => getIt<AddressCubit>()),
+
         BlocProvider(create: (_) => getIt<UpdateReviewCubit>()),
         BlocProvider(create: (_) => getIt<ReceiverCubit>()),
         BlocProvider(create: (_) => getIt<ChatSendMessageCubit>()),

@@ -32,26 +32,33 @@ class _SplashScreenState extends State<SplashScreen>
       curve: Curves.easeInOut,
     ));
 
-    // ✅ تشيك على التوكن للتنقل التلقائي
+    // ✅ تشيك على التوكن وصلاحيته
     _checkLoginStatus();
   }
 
   Future<void> _checkLoginStatus() async {
     final box = await Hive.openBox('authBox');
     final token = box.get('auth_token');
+    final createdAtStr = box.get('auth_token_created_at');
 
-    if (token != null && token.isNotEmpty) {
-      // ✅ مستخدم مسجل قبل كده، نوديه على NavScreen
-      Future.delayed(const Duration(seconds: 2), () {
+    await Future.delayed(const Duration(seconds: 2)); // عشان الأنيميشن يظهر
+
+    if (token != null && token.isNotEmpty && createdAtStr != null) {
+      final createdAt = DateTime.tryParse(createdAtStr);
+      final now = DateTime.now();
+
+      final isValid =
+          createdAt != null && now.difference(createdAt).inHours < 24;
+
+      if (isValid) {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (_) => const NavScreen(initialIndex: 0)),
         );
-      });
+        return;
+      }
     }
-    // ❌ لو مفيش توكن خليه واقف على SplashScreen
-  }
 
-  void _navigateToLogin() {
+    // ❌ لو التوكن مش موجود أو انتهى
     Navigator.of(context).pushReplacement(_createRoute());
   }
 
@@ -88,118 +95,111 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onVerticalDragEnd: (details) {
-        if (details.primaryVelocity != null && details.primaryVelocity! < 0) {
-          _navigateToLogin();
-        }
-      },
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        body: Container(
-          decoration: BoxDecoration(
-            image: DecorationImage(
-              image: const AssetImage("assets/images/splash_bg.png"),
-              fit: BoxFit.cover,
-              colorFilter: ColorFilter.mode(
-                Colors.white.withOpacity(0.9),
-                BlendMode.lighten,
-              ),
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: const AssetImage("assets/images/splash_bg.png"),
+            fit: BoxFit.cover,
+            colorFilter: ColorFilter.mode(
+              Colors.white.withOpacity(0.9),
+              BlendMode.lighten,
             ),
           ),
-          child: Stack(
-            children: [
-              Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(17),
-                      width: 192,
-                      height: 192,
-                      decoration: const BoxDecoration(
-                        color: Color.fromARGB(160, 180, 165, 91),
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          ColorFiltered(
-                            colorFilter: const ColorFilter.mode(
-                              Colors.white,
-                              BlendMode.srcATop,
-                            ),
-                            child: Image.asset("assets/images/logo.png"),
+        ),
+        child: Stack(
+          children: [
+            Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(17),
+                    width: 192,
+                    height: 192,
+                    decoration: const BoxDecoration(
+                      color: Color.fromARGB(160, 180, 165, 91),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ColorFiltered(
+                          colorFilter: const ColorFilter.mode(
+                            Colors.white,
+                            BlendMode.srcATop,
                           ),
-                          const Text(
-                            "Furniture Swap",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold,
-                            ),
+                          child: Image.asset("assets/images/logo.png"),
+                        ),
+                        const Text(
+                          "Furniture Swap",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 20),
-                    const Text(
-                      "Furni Swap",
-                      style: TextStyle(
-                        color: Color(0xff8B5E3C),
-                        fontSize: 30,
-                        fontWeight: FontWeight.bold,
-                      ),
+                  ),
+                  const SizedBox(height: 20),
+                  const Text(
+                    "Furni Swap",
+                    style: TextStyle(
+                      color: Color(0xff8B5E3C),
+                      fontSize: 30,
+                      fontWeight: FontWeight.bold,
                     ),
-                    const SizedBox(height: 10),
-                    const Text(
-                      "Swap, Sell & Style Your Home The Smart Way!",
-                      style: TextStyle(
-                        color: Color(0xff4B5563),
-                        fontSize: 16,
-                      ),
-                      textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 10),
+                  const Text(
+                    "Swap, Sell & Style Your Home The Smart Way!",
+                    style: TextStyle(
+                      color: Color(0xff4B5563),
+                      fontSize: 16,
                     ),
-                  ],
-                ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
               ),
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 25.0),
-                  child: AnimatedBuilder(
-                    animation: _bounceAnimation,
-                    builder: (context, child) {
-                      return Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Transform.translate(
-                            offset: Offset(0, _bounceAnimation.value),
-                            child: const Text(
-                              'Swipe to explore',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                                color: Color(0xff8B5E3C),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 5),
-                          Transform.translate(
-                            offset: Offset(0, _bounceAnimation.value),
-                            child: const Icon(
-                              Icons.keyboard_arrow_down_rounded,
-                              size: 28,
+            ),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 25.0),
+                child: AnimatedBuilder(
+                  animation: _bounceAnimation,
+                  builder: (context, child) {
+                    return Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Transform.translate(
+                          offset: Offset(0, _bounceAnimation.value),
+                          child: const Text(
+                            'Swipe to explore',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
                               color: Color(0xff8B5E3C),
                             ),
                           ),
-                        ],
-                      );
-                    },
-                  ),
+                        ),
+                        const SizedBox(height: 5),
+                        Transform.translate(
+                          offset: Offset(0, _bounceAnimation.value),
+                          child: const Icon(
+                            Icons.keyboard_arrow_down_rounded,
+                            size: 28,
+                            color: Color(0xff8B5E3C),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
